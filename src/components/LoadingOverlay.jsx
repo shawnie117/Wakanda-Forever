@@ -51,3 +51,4 @@ export default function LoadingOverlay({ fullscreen = false, subtitle = 'INITIAL
     </div>
   )
 }
+

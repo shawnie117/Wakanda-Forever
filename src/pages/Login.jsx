@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth'
 import { auth, provider } from '../firebase/firebaseConfig'
 import { Mail, Lock, Loader } from 'lucide-react'
+import PrimaryButton from '../components/PrimaryButton'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -99,7 +100,7 @@ export default function Login() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
-                className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-purple-500 focus:shadow-lg focus:shadow-purple-500/20 text-white placeholder-gray-500 transition-all disabled:opacity-50"
+                className="vibranium-input w-full pl-10 disabled:opacity-50"
               />
             </div>
 
@@ -113,20 +114,18 @@ export default function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={loading}
-                className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-purple-500 focus:shadow-lg focus:shadow-purple-500/20 text-white placeholder-gray-500 transition-all disabled:opacity-50"
+                className="vibranium-input w-full pl-10 disabled:opacity-50"
               />
             </div>
 
             {/* Login Button */}
-            <motion.button
-              whileHover={{ boxShadow: '0 0 30px rgba(168, 85, 247, 0.5)' }}
-              whileTap={{ scale: 0.95 }}
+            <PrimaryButton
               disabled={loading}
               type="submit"
-              className="w-full py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full disabled:opacity-50"
             >
               {loading ? <Loader size={20} className="animate-spin" /> : 'Sign In'}
-            </motion.button>
+            </PrimaryButton>
           </form>
 
           {/* Divider */}
@@ -171,3 +170,5 @@ export default function Login() {
     </motion.div>
   )
 }
+
+

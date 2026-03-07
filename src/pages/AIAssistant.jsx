@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 import GlassCard from '../components/GlassCard'
 import { Send, MessageCircle, Sparkles } from 'lucide-react'
 
@@ -53,6 +54,7 @@ const itemVariants = {
 }
 
 export default function AIAssistant() {
+  const navigate = useNavigate()
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -107,8 +109,9 @@ export default function AIAssistant() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
-      className="container mx-auto px-4 md:px-6 py-12"
+      className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900 p-8"
     >
+      <div className="max-w-7xl mx-auto">
       {/* Header */}
       <motion.div
         variants={containerVariants}
@@ -117,14 +120,23 @@ export default function AIAssistant() {
         className="mb-8"
       >
         <motion.div variants={itemVariants}>
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="text-gray-400 hover:text-white mb-4"
+          >
+            ← Back to Dashboard
+          </button>
+          <p className="font-neo tracking-[0.08em] text-xs uppercase text-slate-400 mb-2">
+            Conversational Intelligence
+          </p>
           <div className="flex items-center gap-3 mb-4">
             <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500/30 to-pink-500/30">
               <Sparkles className="text-purple-300" size={32} />
             </div>
-            <h1 className="section-title">AI Query Interface</h1>
+            <h1 className="font-neo tracking-[0.08em] text-2xl md:text-3xl text-slate-50">AI Query Interface</h1>
           </div>
-          <p className="text-gray-300 text-lg">
-            Ask your AI Assistant anything about your product, market, and competitors.
+          <p className="text-slate-400 text-sm md:text-base">
+            Ask about product strategy, market trends, positioning, and competitor intelligence.
           </p>
         </motion.div>
       </motion.div>
@@ -134,7 +146,7 @@ export default function AIAssistant() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        className="max-w-4xl mx-auto"
+        className="max-w-5xl mx-auto"
       >
         <GlassCard hoverable={false} className="p-0 flex flex-col h-[600px] md:h-[700px]">
           {/* Messages Area */}
@@ -153,7 +165,7 @@ export default function AIAssistant() {
                     className={`max-w-xs md:max-w-md lg:max-w-xl px-4 py-3 rounded-xl ${
                       message.type === 'user'
                         ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-br-none'
-                        : 'glass text-gray-300 rounded-bl-none'
+                            : 'glass text-slate-300 rounded-bl-none'
                     }`}
                   >
                     <p className="text-sm md:text-base leading-relaxed">{message.text}</p>
@@ -237,6 +249,9 @@ export default function AIAssistant() {
           </div>
         </GlassCard>
       </motion.div>
+      </div>
     </motion.main>
   )
 }
+
+

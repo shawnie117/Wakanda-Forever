@@ -4,11 +4,12 @@ import { Link, useNavigate } from 'react-router-dom'
 import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore'
 import { useAuth } from '../context/AuthContext'
 import { db } from '../firebase/firebaseConfig'
-import { getCompanyProfile, getProductsByCompany } from '../firebase/firestoreService'
+import { getSaaSProducts } from '../firebase/firestoreService'
 import GlassCard from '../components/GlassCard'
 import AnalyticsCard from '../components/AnalyticsCard'
 import LoadingOverlay from '../components/LoadingOverlay'
-import { ArrowRight, Zap, BarChart3, TrendingUp, Brain, Plus } from 'lucide-react'
+import PrimaryButton from '../components/PrimaryButton'
+import { ArrowRight, Zap, BarChart3, TrendingUp, Brain, Plus, Globe, Target } from 'lucide-react'
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -34,12 +35,11 @@ export default function Dashboard() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [analyses, setAnalyses] = useState([])
-  const [products, setProducts] = useState([])
-  const [company, setCompany] = useState(null)
+  const [saasProducts, setSaasProducts] = useState([])
   const [stats, setStats] = useState({
+    totalProducts: 0,
     totalAnalyses: 0,
     avgSentiment: 0,
-    avgCompetitor: 0,
   })
   const [loading, setLoading] = useState(true)
 
@@ -48,18 +48,13 @@ export default function Dashboard() {
 
     const fetchData = async () => {
       try {
-        const companyProfile = await getCompanyProfile(user.uid)
-        setCompany(companyProfile)
+        // Fetch SaaS products
+        const products = await getSaaSProducts(user.uid)
+        setSaasProducts(products)
 
-        if (companyProfile?.id) {
-          const companyProducts = await getProductsByCompany(companyProfile.id)
-          setProducts(companyProducts)
-        } else {
-          setProducts([])
-        }
-
+        // Fetch analysis results
         const q = query(
-          collection(db, 'analyses'),
+          collection(db, 'analysis_results'),
           where('userId', '==', user.uid),
           orderBy('createdAt', 'desc'),
           limit(5)
@@ -70,19 +65,15 @@ export default function Dashboard() {
         setAnalyses(data)
 
         // Calculate stats
+        const totalProducts = products.length
         const totalAnalyses = data.length
-        const avgSentiment = totalAnalyses
+        const avgSentiment = totalAnalyses && data[0]?.sentimentScore
           ? Math.round(
-              data.reduce((sum, a) => sum + a.sentimentScore, 0) / totalAnalyses
-            )
-          : 0
-        const avgCompetitor = totalAnalyses
-          ? Math.round(
-              data.reduce((sum, a) => sum + a.competitorScore, 0) / totalAnalyses
+              data.reduce((sum, a) => sum + (a.sentimentScore || 0), 0) / totalAnalyses
             )
           : 0
 
-        setStats({ totalAnalyses, avgSentiment, avgCompetitor })
+        setStats({ totalProducts, totalAnalyses, avgSentiment })
       } catch (err) {
         console.error('Error fetching data:', err)
       } finally {
@@ -96,26 +87,26 @@ export default function Dashboard() {
   const features = [
     {
       icon: Zap,
-      title: 'Product Analysis',
-      description: 'Analyze customer sentiment and get market insights',
-      path: '/analyze',
+      title: 'Market Analysis',
+      description: 'AI-powered SaaS market intelligence and insights',
+      path: '/market-intelligence',
     },
     {
       icon: BarChart3,
-      title: 'Competitor Comparison',
-      description: 'Compare your product with competitors',
-      path: '/compare',
+      title: 'Competitor Discovery',
+      description: 'Find and analyze your SaaS competitors',
+      path: '/competitor-discovery',
     },
     {
       icon: TrendingUp,
-      title: 'Strategic Insights',
-      description: 'Get AI-powered recommendations',
-      path: '/insights',
+      title: 'Product Health',
+      description: 'Monitor key product metrics and KPIs',
+      path: '/product-health',
     },
     {
       icon: Brain,
       title: 'AI Assistant',
-      description: 'Chat with our AI for detailed analysis',
+      description: 'Chat with AI for strategic insights',
       path: '/assistant',
     },
   ]
@@ -146,7 +137,7 @@ export default function Dashboard() {
             {user?.email?.split('@')[0]}
           </h2>
           <p className="text-slate-400 text-sm md:text-base max-w-xl">
-            Your AI powered product intelligence dashboard
+            Your AI-powered SaaS intelligence platform
           </p>
         </motion.div>
       </motion.div>
@@ -166,26 +157,26 @@ export default function Dashboard() {
           >
             <motion.div variants={itemVariants}>
               <AnalyticsCard
+                title="SaaS Products"
+                value={stats.totalProducts}
+                subtitle="Products configured"
+                Icon={Target}
+              />
+            </motion.div>
+            <motion.div variants={itemVariants}>
+              <AnalyticsCard
                 title="Total Analyses"
                 value={stats.totalAnalyses}
-                subtitle="Product analyses created"
+                subtitle="Intelligence reports generated"
                 Icon={BarChart3}
               />
             </motion.div>
             <motion.div variants={itemVariants}>
               <AnalyticsCard
-                title="Avg Sentiment"
+                title="Market Health"
                 value={`${stats.avgSentiment}%`}
-                subtitle="Average sentiment score"
+                subtitle="Average market sentiment"
                 Icon={TrendingUp}
-              />
-            </motion.div>
-            <motion.div variants={itemVariants}>
-              <AnalyticsCard
-                title="Avg Competitor"
-                value={`${stats.avgCompetitor}%`}
-                subtitle="Average competitor score"
-                Icon={BarChart3}
               />
             </motion.div>
           </motion.div>
@@ -255,7 +246,7 @@ export default function Dashboard() {
                 variants={itemVariants}
                 className="font-neo tracking-[0.08em] text-sm uppercase text-slate-400 mb-8"
               >
-                Recent analyses
+                Recent Intelligence Reports
               </motion.h2>
               <motion.div
                 variants={containerVariants}
@@ -288,7 +279,7 @@ export default function Dashboard() {
             </motion.div>
           )}
 
-          {/* Products Section */}
+          {/* SaaS Products Section */}
           <motion.div
             variants={containerVariants}
             initial="hidden"
@@ -299,25 +290,37 @@ export default function Dashboard() {
             <motion.div variants={itemVariants} className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="font-neo tracking-[0.08em] text-sm uppercase text-slate-400 mb-2">
-                  Products
+                  Your SaaS Products
                 </h2>
                 <p className="text-slate-400 text-sm">
-                  {company?.companyName ? `Manage products for ${company.companyName}` : 'Manage your products'}
+                  Manage and analyze your SaaS product portfolio
                 </p>
               </div>
-              <button
-                onClick={() => navigate('/add-product')}
-                className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white text-sm font-medium flex items-center gap-2"
+              <PrimaryButton
+                onClick={() => navigate('/saas-product-setup')}
+                className="text-sm"
               >
-                <Plus size={16} /> Add Product
-              </button>
+                <Plus size={16} /> Add SaaS Product
+              </PrimaryButton>
             </motion.div>
 
-            {products.length === 0 ? (
+            {saasProducts.length === 0 ? (
               <motion.div variants={itemVariants}>
-                <GlassCard className="p-6 text-center">
-                  <p className="text-slate-300 mb-2">No products added yet.</p>
-                  <p className="text-slate-500 text-sm">Click "Add Product" to create your first product.</p>
+                <GlassCard className="p-8 text-center">
+                  <div className="mb-4">
+                    <Target className="w-16 h-16 mx-auto text-purple-400 opacity-50" />
+                  </div>
+                  <h3 className="text-slate-200 text-lg font-semibold mb-2">
+                    No SaaS Products Yet
+                  </h3>
+                  <p className="text-slate-400 text-sm mb-6">
+                    Add your first SaaS product to start AI-powered market intelligence analysis
+                  </p>
+                  <PrimaryButton
+                    onClick={() => navigate('/saas-product-setup')}
+                  >
+                    Add Your First Product
+                  </PrimaryButton>
                 </GlassCard>
               </motion.div>
             ) : (
@@ -328,31 +331,55 @@ export default function Dashboard() {
                 viewport={{ once: true }}
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
               >
-                {products.map((product) => (
+                {saasProducts.map((product) => (
                   <motion.div
                     key={product.id}
                     variants={itemVariants}
-                    onClick={() => navigate(`/analysis/${product.id}`)}
+                    onClick={() => navigate(`/market-intelligence/${product.id}`)}
                     className="cursor-pointer hover:scale-105 hover:shadow-purple-500/30 hover:shadow-lg transition-all duration-300"
                   >
-                    <GlassCard className="p-6 h-full">
-                      <h3 className="text-lg font-bold text-white mb-2">{product.productName}</h3>
-                      <div className="space-y-2 text-sm">
+                    <GlassCard className="p-6 h-full flex flex-col">
+                      <div className="flex items-start justify-between mb-4">
+                        <h3 className="text-lg font-bold text-white">{product.productName}</h3>
+                        <Globe className="text-purple-400" size={20} />
+                      </div>
+                      
+                      {product.website && (
+                        <a
+                          href={product.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-xs text-purple-300 hover:text-purple-200 mb-4 truncate"
+                        >
+                          {product.website}
+                        </a>
+                      )}
+
+                      <div className="space-y-2 text-sm flex-grow">
                         <div className="flex justify-between">
                           <span className="text-slate-400">Category</span>
                           <span className="text-slate-200">{product.category || 'N/A'}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-slate-400">Primary Market</span>
-                          <span className="text-slate-200">{product.primaryMarket || 'N/A'}</span>
+                          <span className="text-slate-400">Business Model</span>
+                          <span className="text-slate-200">{product.businessModel || 'N/A'}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-slate-400">Platforms</span>
+                          <span className="text-slate-400">Pricing</span>
                           <span className="text-purple-300 font-semibold">
-                            {Array.isArray(product.platforms) ? product.platforms.length : 0}
+                            {product.pricingTierRange || 'Not set'}
                           </span>
                         </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">Customer Segment</span>
+                          <span className="text-slate-200">{product.targetCustomerSegment || 'N/A'}</span>
+                        </div>
                       </div>
+
+                      <button className="mt-4 w-full px-4 py-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 hover:from-purple-500/30 hover:to-pink-500/30 text-purple-300 rounded-lg transition-all text-sm font-medium flex items-center justify-center gap-2">
+                        Analyze Product with Vibranium AI <ArrowRight size={16} />
+                      </button>
                     </GlassCard>
                   </motion.div>
                 ))}
@@ -364,3 +391,4 @@ export default function Dashboard() {
     </motion.main>
   )
 }
+

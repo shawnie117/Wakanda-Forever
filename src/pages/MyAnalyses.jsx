@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 import { collection, query, where, orderBy, getDocs } from 'firebase/firestore'
 import { useAuth } from '../context/AuthContext'
 import { db } from '../firebase/firebaseConfig'
@@ -9,6 +10,7 @@ import { Calendar, BarChart3, TrendingUp, Eye } from 'lucide-react'
 
 export default function MyAnalyses() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [analyses, setAnalyses] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -63,8 +65,9 @@ export default function MyAnalyses() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
-      className="container mx-auto px-4 md:px-6 py-12"
+      className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900 p-8"
     >
+      <div className="max-w-7xl mx-auto">
       {/* Header */}
       <motion.div
         variants={containerVariants}
@@ -73,11 +76,20 @@ export default function MyAnalyses() {
         className="mb-12"
       >
         <motion.div variants={itemVariants}>
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-200 via-pink-200 to-purple-200 bg-clip-text text-transparent mb-4">
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="text-gray-400 hover:text-white mb-4"
+          >
+            ← Back to Dashboard
+          </button>
+          <p className="font-neo tracking-[0.08em] text-xs uppercase text-slate-400 mb-2">
+            Intelligence Archive
+          </p>
+          <h1 className="font-neo tracking-[0.08em] text-3xl md:text-4xl text-slate-50 mb-2">
             My Analyses
           </h1>
-          <p className="text-gray-300 text-lg">
-            View all your saved product analyses and insights
+          <p className="text-slate-400 text-sm md:text-base">
+            View saved intelligence reports and track product progress over time.
           </p>
         </motion.div>
       </motion.div>
@@ -87,20 +99,20 @@ export default function MyAnalyses() {
           <LoadingOverlay subtitle="SYNCING ANALYSES" />
         </div>
       ) : error ? (
-        <div className="p-4 bg-red-500/20 border border-red-500/50 rounded-lg text-red-300">
-          {error}
-        </div>
+        <GlassCard hoverable={false} className="p-6 border-red-500/40">
+          <p className="text-red-300 text-sm">{error}</p>
+        </GlassCard>
       ) : analyses.length === 0 ? (
         <GlassCard hoverable={false} className="p-12 text-center">
           <BarChart3 className="text-purple-400 mx-auto mb-4" size={48} />
-          <h3 className="text-2xl font-bold text-white mb-2">No analyses yet</h3>
-          <p className="text-gray-400 mb-6">Start by creating your first product analysis</p>
-          <a
-            href="/analyze"
+          <h3 className="font-neo tracking-[0.08em] text-sm uppercase text-slate-200 mb-2">No analyses yet</h3>
+          <p className="text-slate-400 mb-6 text-sm">Create a SaaS product first, then run Market Intelligence analysis.</p>
+          <button
+            onClick={() => navigate('/saas-product-setup')}
             className="inline-block px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:shadow-lg transition-all"
           >
-            Create Analysis
-          </a>
+            Add SaaS Product
+          </button>
         </GlassCard>
       ) : (
         <motion.div
@@ -117,7 +129,7 @@ export default function MyAnalyses() {
                     <h3 className="text-xl font-bold text-white mb-1">
                       {analysis.productName}
                     </h3>
-                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                    <div className="flex items-center gap-2 text-sm text-slate-400">
                       <Calendar size={16} />
                       {new Date(analysis.createdAt.toDate()).toLocaleDateString('en-US', {
                         year: 'numeric',
@@ -135,7 +147,7 @@ export default function MyAnalyses() {
                       <TrendingUp size={16} className="text-purple-300" />
                     </div>
                     <div>
-                      <p className="text-xs text-gray-400">Sentiment Score</p>
+                      <p className="text-xs text-slate-400">Sentiment Score</p>
                       <p className="text-lg font-bold text-purple-300">
                         {analysis.sentimentScore}%
                       </p>
@@ -147,7 +159,7 @@ export default function MyAnalyses() {
                       <BarChart3 size={16} className="text-pink-300" />
                     </div>
                     <div>
-                      <p className="text-xs text-gray-400">Competitor Score</p>
+                      <p className="text-xs text-slate-400">Competitor Score</p>
                       <p className="text-lg font-bold text-pink-300">
                         {analysis.competitorScore}%
                       </p>
@@ -168,6 +180,9 @@ export default function MyAnalyses() {
           ))}
         </motion.div>
       )}
+      </div>
     </motion.main>
   )
 }
+
+

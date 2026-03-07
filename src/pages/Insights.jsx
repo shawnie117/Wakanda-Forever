@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 import GlassCard from '../components/GlassCard'
 import { Lightbulb, CheckCircle2, AlertCircle } from 'lucide-react'
 import {
@@ -82,25 +83,39 @@ const itemVariants = {
 }
 
 export default function Insights() {
+  const navigate = useNavigate()
+
   return (
     <motion.main
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
-      className="container mx-auto px-4 md:px-6 py-12"
+      className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900 p-8"
     >
+      <div className="max-w-7xl mx-auto">
       {/* Header */}
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="mb-16"
+        className="mb-12"
       >
         <motion.div variants={itemVariants}>
-          <h1 className="section-title mb-4">Intelligence Dashboard</h1>
-          <p className="text-gray-300 text-lg">
-            Deep insights into customer sentiment, trends, and strategic opportunities.
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="text-gray-400 hover:text-white mb-4"
+          >
+            ← Back to Dashboard
+          </button>
+          <p className="font-neo tracking-[0.08em] text-xs uppercase text-slate-400 mb-2">
+            Strategy Layer
+          </p>
+          <h1 className="font-neo tracking-[0.08em] text-3xl md:text-4xl text-slate-50 mb-2">
+            Intelligence Insights
+          </h1>
+          <p className="text-slate-400 text-sm md:text-base max-w-2xl">
+            Deep signals on customer sentiment, trend movement, and strategic product opportunities.
           </p>
         </motion.div>
       </motion.div>
@@ -111,12 +126,14 @@ export default function Insights() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: '-100px' }}
-        className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16"
+        className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12"
       >
         {/* Sentiment Breakdown Pie Chart */}
         <motion.div variants={itemVariants}>
           <GlassCard hoverable={false} className="p-8 flex flex-col items-center">
-            <h3 className="subsection-title mb-6 text-center">Sentiment Breakdown</h3>
+            <h3 className="font-neo tracking-[0.08em] text-sm uppercase text-slate-300 mb-6 text-center">
+              Sentiment Breakdown
+            </h3>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
@@ -136,11 +153,11 @@ export default function Insights() {
                 </Pie>
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: 'rgba(15, 15, 26, 0.9)',
-                    border: '1px solid rgba(168, 85, 247, 0.5)',
+                    backgroundColor: '#1e1b4b',
+                    border: '1px solid rgba(255,255,255,0.1)',
                     borderRadius: '8px',
                   }}
-                  labelStyle={{ color: '#e5e7eb' }}
+                  labelStyle={{ color: '#e2e8f0' }}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -151,7 +168,7 @@ export default function Insights() {
                     className="w-3 h-3 rounded-full"
                     style={{ backgroundColor: item.fill }}
                   ></div>
-                  <span className="text-gray-300 text-sm">
+                  <span className="text-slate-300 text-sm">
                     {item.name}: {item.value}%
                   </span>
                 </div>
@@ -163,19 +180,21 @@ export default function Insights() {
         {/* Sentiment Trend */}
         <motion.div variants={itemVariants}>
           <GlassCard hoverable={false} className="p-8">
-            <h3 className="subsection-title mb-6">Sentiment Trend (6 Weeks)</h3>
+            <h3 className="font-neo tracking-[0.08em] text-sm uppercase text-slate-300 mb-6">
+              Sentiment Trend (6 Weeks)
+            </h3>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={trendData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(168, 85, 247, 0.2)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
                 <XAxis dataKey="week" stroke="#9ca3af" />
                 <YAxis stroke="#9ca3af" />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: 'rgba(15, 15, 26, 0.9)',
-                    border: '1px solid rgba(168, 85, 247, 0.5)',
+                    backgroundColor: '#1e1b4b',
+                    border: '1px solid rgba(255,255,255,0.1)',
                     borderRadius: '8px',
                   }}
-                  labelStyle={{ color: '#e5e7eb' }}
+                  labelStyle={{ color: '#e2e8f0' }}
                 />
                 <Legend />
                 <Line
@@ -217,7 +236,7 @@ export default function Insights() {
           <GlassCard hoverable={true} className="p-8 h-full">
             <div className="flex items-center gap-3 mb-4">
               <CheckCircle2 className="text-green-400" size={28} />
-              <h3 className="text-xl font-bold text-white">Top Strengths</h3>
+              <h3 className="font-neo tracking-[0.08em] text-sm uppercase text-slate-200">Top Strengths</h3>
             </div>
             <ul className="space-y-3">
               {[
@@ -225,7 +244,7 @@ export default function Insights() {
                 'Outstanding customer support (92% satisfaction)',
                 'Innovative features (88% positive)',
               ].map((strength, idx) => (
-                <li key={idx} className="flex items-start gap-3 text-gray-300">
+                <li key={idx} className="flex items-start gap-3 text-slate-300 text-sm">
                   <div className="w-2 h-2 rounded-full bg-green-400 mt-2 flex-shrink-0"></div>
                   <span>{strength}</span>
                 </li>
@@ -238,7 +257,7 @@ export default function Insights() {
           <GlassCard hoverable={true} className="p-8 h-full">
             <div className="flex items-center gap-3 mb-4">
               <AlertCircle className="text-orange-400" size={28} />
-              <h3 className="text-xl font-bold text-white">Top Complaints</h3>
+              <h3 className="font-neo tracking-[0.08em] text-sm uppercase text-slate-200">Top Complaints</h3>
             </div>
             <ul className="space-y-3">
               {[
@@ -246,7 +265,7 @@ export default function Insights() {
                 'Battery life concerns (28%)',
                 'Limited color options (22%)',
               ].map((complaint, idx) => (
-                <li key={idx} className="flex items-start gap-3 text-gray-300">
+                <li key={idx} className="flex items-start gap-3 text-slate-300 text-sm">
                   <div className="w-2 h-2 rounded-full bg-orange-400 mt-2 flex-shrink-0"></div>
                   <span>{complaint}</span>
                 </li>
@@ -265,7 +284,7 @@ export default function Insights() {
               <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500/30 to-pink-500/30">
                 <Lightbulb className="text-purple-300" size={32} />
               </div>
-              <h2 className="text-3xl font-bold text-white">AI Strategic Recommendations</h2>
+              <h2 className="font-neo tracking-[0.08em] text-base uppercase text-slate-100">AI Strategic Recommendations</h2>
             </div>
 
             <motion.div
@@ -281,11 +300,11 @@ export default function Insights() {
                   variants={itemVariants}
                   className="bg-white/5 border border-purple-500/20 rounded-xl p-6 hover:bg-white/10 transition-colors"
                 >
-                  <h3 className="text-lg font-bold text-purple-200 mb-2">{rec.title}</h3>
-                  <p className="text-gray-400 text-sm mb-4">{rec.description}</p>
+                  <h3 className="text-base font-semibold text-purple-200 mb-2">{rec.title}</h3>
+                  <p className="text-slate-400 text-sm mb-4">{rec.description}</p>
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold text-gray-400">Impact:</span>
+                      <span className="text-xs font-semibold text-slate-400">Impact:</span>
                       <span
                         className={`text-xs font-bold px-2 py-1 rounded ${
                           rec.impact === 'High'
@@ -297,7 +316,7 @@ export default function Insights() {
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold text-gray-400">Effort:</span>
+                      <span className="text-xs font-semibold text-slate-400">Effort:</span>
                       <span
                         className={`text-xs font-bold px-2 py-1 rounded ${
                           rec.effort === 'Low'
@@ -317,6 +336,9 @@ export default function Insights() {
           </div>
         </GlassCard>
       </motion.div>
+      </div>
     </motion.main>
   )
 }
+
+

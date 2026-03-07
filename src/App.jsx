@@ -5,19 +5,19 @@ import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Navbar from './components/Navbar'
 import LoadingScreen from './components/LoadingScreen'
+import Footer from './components/Footer'
 
 // Pages
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
-import Analysis from './pages/Analysis'
-import Comparison from './pages/Comparison'
+import MarketIntelligence from './pages/MarketIntelligence'
+import ProductHealth from './pages/ProductHealth'
+import CompetitorDiscovery from './pages/CompetitorDiscovery'
 import Insights from './pages/Insights'
 import AIAssistant from './pages/AIAssistant'
 import MyAnalyses from './pages/MyAnalyses'
-import MarketRadar from './pages/MarketRadar'
-import CompanySetup from './pages/CompanySetup'
-import AddProduct from './pages/AddProduct'
+import SaaSProductSetup from './pages/SaaSProductSetup'
 
 function App() {
   const [isLoading, setIsLoading] = useState(true)
@@ -37,23 +37,13 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="font-sans min-h-screen bg-gradient-to-br from-[#020204] via-[#07010f] to-[#140024] text-slate-100">
+        <div className="vibranium-bg font-sans min-h-screen text-slate-100">
           <Navbar />
           <AnimatePresence mode="wait">
             <Routes>
               {/* Public Routes */}
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
-
-              {/* Company Setup Route - requires login but NOT company profile */}
-              <Route
-                path="/company-setup"
-                element={
-                  <ProtectedRoute requireProfile={false}>
-                    <CompanySetup />
-                  </ProtectedRoute>
-                }
-              />
 
               {/* Protected Routes */}
               <Route
@@ -65,26 +55,42 @@ function App() {
                 }
               />
               <Route
-                path="/analyze"
+                path="/saas-product-setup"
                 element={
                   <ProtectedRoute>
-                    <Analysis />
+                    <SaaSProductSetup />
                   </ProtectedRoute>
                 }
               />
               <Route
-                path="/analysis/:productId"
+                path="/market-intelligence"
                 element={
                   <ProtectedRoute>
-                    <Analysis />
+                    <MarketIntelligence />
                   </ProtectedRoute>
                 }
               />
               <Route
-                path="/compare"
+                path="/market-intelligence/:productId"
                 element={
                   <ProtectedRoute>
-                    <Comparison />
+                    <MarketIntelligence />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/product-health"
+                element={
+                  <ProtectedRoute>
+                    <ProductHealth />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/competitor-discovery"
+                element={
+                  <ProtectedRoute>
+                    <CompetitorDiscovery />
                   </ProtectedRoute>
                 }
               />
@@ -105,26 +111,10 @@ function App() {
                 }
               />
               <Route
-                path="/market-radar"
-                element={
-                  <ProtectedRoute>
-                    <MarketRadar />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
                 path="/my-analyses"
                 element={
                   <ProtectedRoute>
                     <MyAnalyses />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/add-product"
-                element={
-                  <ProtectedRoute>
-                    <AddProduct />
                   </ProtectedRoute>
                 }
               />
@@ -133,6 +123,7 @@ function App() {
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
             </Routes>
           </AnimatePresence>
+          <Footer />
         </div>
       </AuthProvider>
     </Router>
@@ -140,3 +131,5 @@ function App() {
 }
 
 export default App
+
+

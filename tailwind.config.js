@@ -7,12 +7,22 @@ export default {
   theme: {
     extend: {
       colors: {
+        vibranium: {
+          bg: '#0b0b15',
+          surface: '#141428',
+          card: '#1a1a2e',
+          primary: '#8b5cf6',
+          secondary: '#a855f7',
+          accent: '#c084fc',
+          glow: '#9333ea',
+        },
         'vibrant-dark': '#0f0f1a',
         'vibrant-purple': '#6d28d9',
         'vibrant-light-purple': '#a855f7',
         'vibrant-accent': '#ec4899',
       },
       backgroundImage: {
+        'vibranium-gradient': 'radial-gradient(circle at top, rgba(139,92,246,0.25), transparent 60%)',
         'gradient-cosmic': 'linear-gradient(to bottom right, #05010a, #0f0018, #1a0033, #2a0050, #3b0764)',
       },
       boxShadow: {

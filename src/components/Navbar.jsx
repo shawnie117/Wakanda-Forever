@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { signOut } from 'firebase/auth'
 import { Menu, X, LogOut, FileText } from 'lucide-react'
@@ -11,12 +11,13 @@ export default function Navbar() {
   const [showProfile, setShowProfile] = useState(false)
   const { user } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const navLinks = [
     { name: 'Dashboard', path: '/dashboard' },
-    { name: 'Analyze', path: '/analyze' },
-    { name: 'Compare', path: '/compare' },
-    { name: 'Market Radar', path: '/market-radar' },
+    { name: 'Market Intelligence', path: '/market-intelligence' },
+    { name: 'Competitor Discovery', path: '/competitor-discovery' },
+    { name: 'Product Health', path: '/product-health' },
     { name: 'Insights', path: '/insights' },
     { name: 'AI Assistant', path: '/assistant' },
   ]
@@ -28,6 +29,13 @@ export default function Navbar() {
     } catch (error) {
       console.error('Logout failed:', error)
     }
+  }
+
+  const isActivePath = (path) => {
+    if (path === '/market-intelligence') {
+      return location.pathname.startsWith('/market-intelligence')
+    }
+    return location.pathname === path
   }
 
   return (
@@ -62,7 +70,11 @@ export default function Navbar() {
                 <Link key={link.path} to={link.path}>
                   <motion.div
                     whileHover={{ y: -2 }}
-                    className="text-sm font-medium text-slate-300 hover:text-purple-300 transition-all duration-200 cursor-pointer"
+                    className={`text-sm font-medium transition-all duration-200 cursor-pointer ${
+                      isActivePath(link.path)
+                        ? 'text-purple-400'
+                        : 'text-gray-400 hover:text-purple-300'
+                    }`}
                   >
                     {link.name}
                   </motion.div>
@@ -201,3 +213,4 @@ export default function Navbar() {
     </nav>
   )
 }
+
