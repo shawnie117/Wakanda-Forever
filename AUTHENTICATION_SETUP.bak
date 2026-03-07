@@ -1,0 +1,188 @@
+# VIBRANIUM Authentication Setup Guide
+
+## Quick Start
+
+### 1. Supabase Project Setup
+
+1. Go to https://supabase.com and create a free account
+2. Create a new project
+3. Wait for the project to initialize
+4. Go to **Settings > API** to find your credentials
+
+### 2. Get Your Credentials
+
+- **Project URL**: Copy from Settings > API
+
+  ```
+  Example: https://xyzabc.supabase.co
+  ```
+
+- **Anon Key**: Copy from Settings > API
+
+  ```
+  Example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+  ```
+
+### 3. Create `.env.local`
+
+Create this file in the project root:
+
+```bash
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your_anon_key_here
+```
+
+### 4. Set Up Database
+
+1. Go to Supabase Dashboard
+2. Click **SQL Editor** on the left
+3. Click **New Query**
+4. Paste this SQL:
+
+```sql
+-- Create analyses table
+CREATE TABLE analyses (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  product_name TEXT NOT NULL,
+  sentiment_score INTEGER,
+  competitor_score INTEGER,
+  created_at TIMESTAMP DEFAULT now()
+);
+
+-- Create index for faster queries
+CREATE INDEX idx_analyses_user_id ON analyses(user_id);
+
+-- Enable Row Level Security
+ALTER TABLE analyses ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Users can only see their own analyses
+CREATE POLICY "Users can view own analyses"
+  ON analyses FOR SELECT
+  USING (auth.uid() = user_id);
+
+-- Policy: Users can insert their own analyses
+CREATE POLICY "Users can insert own analyses"
+  ON analyses FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+```
+
+5. Click **Run** button
+
+### 5. Optional: Set Up Google OAuth
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com)
+2. Create new OAuth Credentials (OAuth 2.0 Client ID)
+3. Add authorized redirect URI: `https://yourproject.supabase.co/auth/v1/callback`
+4. Copy Client ID and Client Secret
+5. In Supabase > Authentication > Providers > Google:
+   - Paste Client ID and Client Secret
+   - Click Save
+
+### 6. Run the Project
+
+```bash
+npm install
+npm run dev
+```
+
+The app will be at `http://localhost:5173`
+
+### 7. Test Authentication
+
+1. Go to `/signup` to create an account
+2. Enter email and password
+3. Click "Create Account"
+4. You'll be redirected to `/dashboard`
+5. Your email should appear in the navbar
+
+## Features After Setup
+
+✅ **Email/Password Authentication**
+- Sign up at `/signup`
+- Sign in at `/login`
+- Automatic session management
+
+✅ **Google OAuth** (if configured)
+- "Continue with Google" button
+- Automatic account creation
+
+✅ **Protected Routes**
+- All dashboard pages require login
+- Redirects to `/login` if not authenticated
+
+✅ **User Data**
+- Each user sees only their own analyses
+- Data automatically saved to database
+- `My Analyses` page shows history
+
+## Troubleshooting
+
+### "Supabase not configured"
+- Check `.env.local` exists
+- Verify `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
+- Restart dev server after creating `.env.local`
+
+### "Cannot analyze product"
+- Check user is logged in
+- Verify database table exists in Supabase
+- Check browser console for errors
+
+### "Analyses not showing in My Analyses"
+- Refresh the page
+- Check Supabase SQL: `SELECT * FROM analyses`
+- Verify user_id is correct in database
+
+### Google OAuth not working
+- Verify OAuth credentials in Supabase
+- Check redirect URL matches configuration
+- Clear browser cookies and try again
+
+## File Locations
+
+- **Login Page**: `src/pages/Login.jsx`
+- **Signup Page**: `src/pages/Signup.jsx`
+- **Auth Context**: `src/context/AuthContext.jsx`
+- **Supabase Client**: `src/lib/supabase.js`
+- **Protected Route**: `src/components/ProtectedRoute.jsx`
+
+## Database Schema
+
+```sql
+Table: analyses
+├── id (UUID) - Primary key
+├── user_id (UUID) - References auth.users
+├── product_name (TEXT)
+├── sentiment_score (INTEGER)
+├── competitor_score (INTEGER)
+└── created_at (TIMESTAMP)
+```
+
+## API Endpoints Used
+
+### Authentication
+- `supabase.auth.signUp()` - Create new account
+- `supabase.auth.signInWithPassword()` - Email login
+- `supabase.auth.signInWithOAuth({provider})` - OAuth login
+- `supabase.auth.signOut()` - Logout
+- `supabase.auth.getUser()` - Get current user
+
+### Database
+- `supabase.from("analyses").insert()` - Save analysis
+- `supabase.from("analyses").select()` - Get analyses
+- `.eq("user_id", user.id)` - Filter by user
+
+## Next Steps
+
+1. ✅ Set up Supabase project
+2. ✅ Add environment variables
+3. ✅ Create database table
+4. ✅ (Optional) Configure Google OAuth
+5. ✅ Run `npm run dev`
+6. 🚀 Start using VIBRANIUM!
+
+## Support
+
+- **Supabase Docs**: https://supabase.com/docs
+- **React Router**: https://reactrouter.com
+- **Tailwind CSS**: https://tailwindcss.com
