@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useAuth } from '../context/AuthContext'
 import {
   Rocket, Target, Users, TrendingUp, Globe, Settings2, ArrowRight, ArrowLeft, Plus, X, Check,
 } from 'lucide-react'
@@ -14,6 +15,13 @@ import {
   COMPETITOR_PLATFORMS,
   ANALYSIS_FEATURES,
 } from '../context/ProductContext'
+import {
+  createSaaSProduct,
+  saveProductFeatures,
+  saveProductDistribution,
+  saveCompetitorInputs,
+  saveAnalysisPreferences,
+} from '../firebase/firestoreService'
 
 // ─── Shared Components ──────────────────────────────────────────────────────
 
@@ -413,11 +421,13 @@ const STEPS = [
 
 export default function ProductSetup() {
   const { product, setProduct } = useProduct()
+  const { user } = useAuth()
   const navigate = useNavigate()
 
   const [step, setStep] = useState(1)
   const [localData, setLocalData] = useState({ ...product })
   const [error, setError] = useState('')
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     setLocalData({ ...product })
@@ -442,10 +452,76 @@ export default function ProductSetup() {
 
   const prev = () => { if (step > 1) setStep(step - 1) }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!localData.productName?.trim()) { setError('Product name is required.'); return }
-    setProduct(localData)
-    navigate('/dashboard')
+    if (!user?.uid) { setError('Please sign in again before saving.'); return }
+
+    setSaving(true)
+    setError('')
+
+    try {
+      const targetCustomerSegment = (localData.customerSegments || []).join(', ')
+      const targetCompanySize = (localData.companySizes || []).join(', ')
+      const primaryUserPersona = (localData.userPersonas || []).join(', ')
+
+      const productId = await createSaaSProduct(user.uid, {
+        productName: localData.productName,
+        website: localData.websiteUrl || '',
+        category: localData.category || '',
+        description: localData.description || '',
+        targetCustomerSegment,
+        coreProblem: localData.coreProblem || '',
+        uniqueValueProposition: localData.uvp || '',
+        businessModel: localData.businessModel || '',
+        pricingTierRange: localData.pricingRange || '',
+        targetMarketRegion: localData.marketRegion || '',
+        targetIndustries: localData.targetIndustries || [],
+        targetCompanySize,
+        primaryUserPersona,
+      })
+
+      const platforms = (localData.distributionChannels || [])
+        .filter((ch) => ch.platform?.trim() && ch.url?.trim())
+        .map((ch) => ({
+          platformName: ch.platform.trim(),
+          productURL: ch.url.trim(),
+        }))
+
+      const prefs = localData.analysisPreferences || {}
+
+      await Promise.all([
+        saveProductFeatures(productId, localData.keyFeatures || []),
+        saveProductDistribution(productId, platforms),
+        saveCompetitorInputs(productId, {
+          knownCompetitors: localData.competitors || [],
+          competitorSearchKeywords: localData.competitorKeywords || [],
+          alternativeCategories: localData.alternativeCategories || [],
+          searchPlatforms: localData.competitorPlatforms || [],
+        }),
+        saveAnalysisPreferences(productId, {
+          compareFeatures: prefs.competitor_features ?? true,
+          pricingBenchmark: prefs.pricing_benchmark ?? true,
+          sentimentAnalysis: prefs.sentiment ?? true,
+          marketGapDetection: prefs.market_gaps ?? true,
+          featureOpportunityInsights: prefs.feature_opportunities ?? true,
+          positioningRecommendations: prefs.positioning ?? true,
+          outputTypes: [],
+        }),
+      ])
+
+      setProduct({
+        ...localData,
+        firestoreProductId: productId,
+        _isDraft: false,
+        _previousActiveId: undefined,
+      })
+      navigate('/dashboard')
+    } catch (saveError) {
+      console.error('Error saving product setup to Firestore:', saveError)
+      setError('Failed to save product details to database. Please try again.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -527,9 +603,10 @@ export default function ProductSetup() {
                 whileTap={{ scale: 0.97 }}
                 type="button"
                 onClick={handleSave}
+                disabled={saving}
                 className="flex items-center gap-2 px-7 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl text-sm"
               >
-                <Check size={16} /> Save & Start Analyzing
+                <Check size={16} /> {saving ? 'Saving...' : 'Save & Start Analyzing'}
               </motion.button>
             )}
           </div>

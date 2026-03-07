@@ -206,10 +206,37 @@ export function ProductProvider({ children }) {
   const addNewProduct = () => {
     const newId = `prod_${Date.now()}`
     setStore(prev => {
+      const previousActiveId = prev.activeId
       const next = { 
         activeId: newId, 
-        products: [...prev.products, { id: newId, ...defaultProduct }] 
+        products: [
+          ...prev.products,
+          { id: newId, ...defaultProduct, _isDraft: true, _previousActiveId: previousActiveId },
+        ],
       }
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)) } catch (_) {}
+      return next
+    })
+  }
+
+  const discardActiveDraftIfEmpty = () => {
+    setStore((prev) => {
+      const active = prev.products.find((p) => p.id === prev.activeId)
+      if (!active?._isDraft) return prev
+
+      // Only auto-discard untouched drafts. If name exists, user started entering real data.
+      if (active.productName?.trim()) return prev
+
+      const remainingProducts = prev.products.filter((p) => p.id !== active.id)
+      const fallbackByPrevious = remainingProducts.find((p) => p.id === active._previousActiveId)
+      const fallbackByName = remainingProducts.find((p) => p.productName?.trim())
+      const fallback = fallbackByPrevious || fallbackByName || remainingProducts[0]
+
+      const next = {
+        activeId: fallback?.id || 'default',
+        products: remainingProducts.length ? remainingProducts : [{ id: 'default', ...defaultProduct }],
+      }
+
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)) } catch (_) {}
       return next
     })
@@ -240,6 +267,7 @@ export function ProductProvider({ children }) {
         clearProduct, 
         switchProduct,
         addNewProduct,
+        discardActiveDraftIfEmpty,
         hasProduct,
         isLoadingFromFirestore 
       }}

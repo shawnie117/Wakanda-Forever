@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
@@ -31,8 +31,14 @@ function getDisplayName(user) {
 
 export default function Dashboard() {
   const { user } = useAuth()
-  const { store, product, hasProduct, switchProduct, addNewProduct } = useProduct()
+  const { store, product, hasProduct, switchProduct, addNewProduct, discardActiveDraftIfEmpty } = useProduct()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    discardActiveDraftIfEmpty()
+    // Run once when Dashboard mounts to recover from empty add-product drafts.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Derive live stats from localStorage cache (no Firestore)
   const stats = useMemo(() => {
