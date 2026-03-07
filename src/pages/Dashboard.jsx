@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext'
 import { db } from '../firebase/firebaseConfig'
 import GlassCard from '../components/GlassCard'
 import AnalyticsCard from '../components/AnalyticsCard'
+import LoadingOverlay from '../components/LoadingOverlay'
 import { ArrowRight, Zap, BarChart3, TrendingUp, Brain } from 'lucide-react'
 
 const containerVariants = {
@@ -137,12 +138,8 @@ export default function Dashboard() {
       </motion.div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="w-12 h-12 border-4 border-purple-500/20 border-t-purple-500 rounded-full"
-          />
+        <div className="relative min-h-[320px]">
+          <LoadingOverlay subtitle="LOADING DASHBOARD DATA" />
         </div>
       ) : (
         <>

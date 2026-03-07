@@ -1,8 +1,10 @@
+import { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Navbar from './components/Navbar'
+import LoadingScreen from './components/LoadingScreen'
 
 // Pages
 import Login from './pages/Login'
@@ -15,6 +17,20 @@ import AIAssistant from './pages/AIAssistant'
 import MyAnalyses from './pages/MyAnalyses'
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 3000)
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (isLoading) {
+    return <LoadingScreen />
+  }
+
   return (
     <Router>
       <AuthProvider>
