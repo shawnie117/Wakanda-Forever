@@ -21,7 +21,7 @@ export default function AIAssistant() {
   const navigate = useNavigate()
   const [messages, setMessages] = useState([
     {
-      id: 1,
+      id: 'welcome',
       role: 'assistant',
       text: "Hello! I'm VIBRANIUM AI — your product intelligence assistant. Ask me anything about sentiment, competitor positioning, feature gaps, pricing strategy, or improvement opportunities!",
     },
@@ -38,14 +38,16 @@ export default function AIAssistant() {
     const query = text.trim()
     if (!query || isLoading) return
 
-    const userMsg = { id: Date.now(), role: 'user', text: query }
+    // Generate unique IDs using timestamp + random to prevent collisions
+    const timestamp = Date.now()
+    const userMsg = { id: `user-${timestamp}-${Math.random()}`, role: 'user', text: query }
     setMessages((prev) => [...prev, userMsg])
     setInput('')
     setIsLoading(true)
 
     // Build history for the API (exclude system welcome message)
     const history = messages
-      .filter((m) => m.id !== 1)
+      .filter((m) => m.id !== 'welcome')
       .map((m) => ({ role: m.role === 'user' ? 'user' : 'assistant', content: m.text }))
 
     try {
@@ -70,7 +72,7 @@ export default function AIAssistant() {
       setMessages((prev) => [
         ...prev,
         {
-          id: Date.now() + 1,
+          id: `assistant-${Date.now()}-${Math.random()}`,
           role: 'assistant',
           text: reply,
           generatedBy: data?.generated_by,
@@ -81,7 +83,7 @@ export default function AIAssistant() {
       setMessages((prev) => [
         ...prev,
         {
-          id: Date.now() + 1,
+          id: `assistant-error-${Date.now()}-${Math.random()}`,
           role: 'assistant',
           text: `Sorry, I couldn't reach the AI backend. Make sure the backend is running at ${AI_BASE} and try again. (${err.message})`,
         },
@@ -208,7 +210,7 @@ export default function AIAssistant() {
             </div>
 
             {/* Suggested prompts (shown only at start) */}
-            {messages.length === 1 && !isLoading && (
+            {messages.length === 1 && messages[0].id === 'welcome' && !isLoading && (
               <div className="px-6 md:px-8 pb-2">
                 <p className="text-xs text-gray-400 font-semibold uppercase mb-2">Suggested Prompts</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
