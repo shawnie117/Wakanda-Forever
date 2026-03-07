@@ -82,11 +82,67 @@ body {
 
   .vibranium-input {
     @apply bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/30 transition-all;
+    color-scheme: dark;
+  }
+
+  .vibranium-input::placeholder {
+    @apply text-slate-500;
+  }
+
+  .vibranium-input:disabled {
+    @apply opacity-50 cursor-not-allowed;
   }
 
   .chart-grid {
     stroke: rgba(255, 255, 255, 0.05);
   }
+}
+
+/* Select/Option Styling for Dark Theme */
+select,
+select option {
+  color-scheme: dark;
+}
+
+select option {
+  background-color: #1a1a2e;
+  color: #e5e7eb;
+  padding: 8px;
+}
+
+select option:checked {
+  background: linear-gradient(#8b5cf6, #8b5cf6);
+  background-color: #8b5cf6;
+  color: white;
+}
+
+select option:hover {
+  background: #2d2d44;
+  color: #e5e7eb;
+}
+
+/* Firefox Select Styling */
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b5cf6' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 28px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+input,
+textarea,
+select {
+  accent-color: #8b5cf6;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
 }
 
 .card-glow:hover {

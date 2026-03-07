@@ -327,7 +327,7 @@ export default function RegionalMarketMap() {
                 <select
                   value={filters.timeRange}
                   onChange={(e) => setFilters({ ...filters, timeRange: e.target.value })}
-                  className="vibranium-input w-full"
+                  className="vibranium-input w-full appearance-none bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-slate-100 focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all"
                 >
                   <option value="7days">Last 7 days</option>
                   <option value="30days">Last 30 days</option>
@@ -340,7 +340,7 @@ export default function RegionalMarketMap() {
                 <select
                   value={filters.category}
                   onChange={(e) => setFilters({ ...filters, category: e.target.value })}
-                  className="vibranium-input w-full"
+                  className="vibranium-input w-full appearance-none bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-slate-100 focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all"
                 >
                   <option value="all">All Categories</option>
                   <option value="productivity">Productivity</option>
@@ -354,7 +354,7 @@ export default function RegionalMarketMap() {
                 <select
                   value={filters.competitor}
                   onChange={(e) => setFilters({ ...filters, competitor: e.target.value })}
-                  className="vibranium-input w-full"
+                  className="vibranium-input w-full appearance-none bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-slate-100 focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all"
                 >
                   <option value="all">All Competitors</option>
                   <option value="direct">Direct Competitors</option>
@@ -366,7 +366,7 @@ export default function RegionalMarketMap() {
                 <select
                   value={filters.segment}
                   onChange={(e) => setFilters({ ...filters, segment: e.target.value })}
-                  className="vibranium-input w-full"
+                  className="vibranium-input w-full appearance-none bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-slate-100 focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all"
                 >
                   <option value="all">All Segments</option>
                   <option value="enterprise">Enterprise</option>
