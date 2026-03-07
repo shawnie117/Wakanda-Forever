@@ -4,7 +4,9 @@ import { Link } from 'react-router-dom'
 import GlassCard from '../components/GlassCard'
 import { Lightbulb, CheckCircle2, AlertCircle, RefreshCw, Settings, TrendingUp, Brain } from 'lucide-react'
 import { useProduct } from '../context/ProductContext'
+import { useAuth } from '../context/AuthContext'
 import { loadCache, saveCache, CACHE_TYPES } from '../services/cacheService'
+import { saveAnalysisToHistory } from '../firebase/firestoreService'
 import {
   PieChart, Pie, LineChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, Cell,
@@ -44,6 +46,7 @@ function parseLines(text) {
 
 export default function Insights() {
   const { product, hasProduct } = useProduct()
+  const { user } = useAuth()
 
   // Load cached analysis result as the "latest analysis" source
   const cachedAnalysis = hasProduct
@@ -177,6 +180,27 @@ export default function Insights() {
         strengths: newStrengths,
         complaints: newComplaints,
       })
+
+      // Save to Firestore for persistence
+      if (user?.uid) {
+        try {
+          await saveAnalysisToHistory(user.uid, {
+            productName: product.productName,
+            sentimentScore: sentimentScore || 0,
+            insights: newRecs.map(r => r.description),
+            features: extractedFeatures,
+            metadata: {
+              type: 'insights',
+              strengths: newStrengths,
+              complaints: newComplaints,
+              category: product.category,
+              businessModel: product.businessModel,
+            },
+          })
+        } catch (error) {
+          console.error('Error saving insights to Firestore:', error)
+        }
+      }
     } catch (err) {
       console.error('Insights error:', err)
     } finally {

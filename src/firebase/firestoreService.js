@@ -396,5 +396,108 @@ export async function getLatestAnalysis(productId) {
   }
 }
 
+// ========================
+// USER DATA & SESSIONS
+// ========================
+
+/**
+ * Save user's current product context (for persistence across sessions)
+ */
+export async function saveUserProductContext(userId, productData) {
+  try {
+    const userContextRef = doc(db, 'user_contexts', userId)
+    await setDoc(
+      userContextRef,
+      {
+        productData,
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true }
+    )
+  } catch (error) {
+    console.error('Error saving user product context:', error)
+    throw error
+  }
+}
+
+/**
+ * Get user's product context
+ */
+export async function getUserProductContext(userId) {
+  try {
+    const userContextRef = doc(db, 'user_contexts', userId)
+    const docSnap = await getDoc(userContextRef)
+    
+    if (docSnap.exists()) {
+      return docSnap.data().productData || null
+    }
+    return null
+  } catch (error) {
+    console.error('Error getting user product context:', error)
+    return null
+  }
+}
+
+/**
+ * Save user preferences
+ */
+export async function saveUserPreferences(userId, preferences) {
+  try {
+    const userPrefsRef = doc(db, 'user_preferences', userId)
+    await setDoc(
+      userPrefsRef,
+      {
+        ...preferences,
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true }
+    )
+  } catch (error) {
+    console.error('Error saving user preferences:', error)
+    throw error
+  }
+}
+
+/**
+ * Get user preferences
+ */
+export async function getUserPreferences(userId) {
+  try {
+    const userPrefsRef = doc(db, 'user_preferences', userId)
+    const docSnap = await getDoc(userPrefsRef)
+    
+    if (docSnap.exists()) {
+      return docSnap.data()
+    }
+    return null
+  } catch (error) {
+    console.error('Error getting user preferences:', error)
+    return null
+  }
+}
+
+/**
+ * Save analysis to user's history
+ */
+export async function saveAnalysisToHistory(userId, analysisData) {
+  try {
+    const analysesRef = collection(db, 'analyses')
+    const docRef = await addDoc(analysesRef, {
+      userId,
+      productName: analysisData.productName || '',
+      sentimentScore: analysisData.sentimentScore || 0,
+      competitorScore: analysisData.competitorScore || 0,
+      insights: analysisData.insights || [],
+      features: analysisData.features || [],
+      metadata: analysisData.metadata || {},
+      createdAt: serverTimestamp(),
+    })
+    return docRef.id
+  } catch (error) {
+    console.error('Error saving analysis to history:', error)
+    throw error
+  }
+}
+
 
 

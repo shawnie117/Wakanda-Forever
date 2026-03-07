@@ -1,4 +1,6 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
+import { useAuth } from './AuthContext'
+import { saveUserProductContext, getUserProductContext } from '../firebase/firestoreService'
 
 const ProductContext = createContext(null)
 const STORAGE_KEY = 'vibranium_saas_product_v2'
@@ -88,6 +90,7 @@ const defaultProduct = {
 }
 
 export function ProductProvider({ children }) {
+  const { user } = useAuth()
   const [product, setProductState] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
@@ -95,6 +98,73 @@ export function ProductProvider({ children }) {
     } catch (_) {}
     return defaultProduct
   })
+  const [isLoadingFromFirestore, setIsLoadingFromFirestore] = useState(false)
+  const [lastSyncedProduct, setLastSyncedProduct] = useState(null)
+
+  // Load user's product data from Firestore when user logs in
+  useEffect(() => {
+    if (!user?.uid) {
+      // User logged out - clear product data
+      setProductState(defaultProduct)
+      try { localStorage.removeItem(STORAGE_KEY) } catch (_) {}
+      setLastSyncedProduct(null)
+      return
+    }
+
+    // Load from Firestore
+    async function loadUserProduct() {
+      setIsLoadingFromFirestore(true)
+      try {
+        const firestoreData = await getUserProductContext(user.uid)
+        
+        if (firestoreData) {
+          const mergedData = { ...defaultProduct, ...firestoreData }
+          setProductState(mergedData)
+          setLastSyncedProduct(mergedData)
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedData))
+          } catch (_) {}
+        } else {
+          // No Firestore data, check localStorage
+          try {
+            const localData = localStorage.getItem(STORAGE_KEY)
+            if (localData) {
+              const parsed = JSON.parse(localData)
+              setProductState({ ...defaultProduct, ...parsed })
+              // Save to Firestore to sync
+              await saveUserProductContext(user.uid, parsed)
+              setLastSyncedProduct(parsed)
+            }
+          } catch (_) {}
+        }
+      } catch (error) {
+        console.error('Error loading product from Firestore:', error)
+      } finally {
+        setIsLoadingFromFirestore(false)
+      }
+    }
+
+    loadUserProduct()
+  }, [user?.uid])
+
+  // Auto-save to Firestore when product changes (with debouncing)
+  useEffect(() => {
+    if (!user?.uid || isLoadingFromFirestore) return
+    
+    // Don't save if product hasn't actually changed
+    if (JSON.stringify(product) === JSON.stringify(lastSyncedProduct)) return
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        await saveUserProductContext(user.uid, product)
+        setLastSyncedProduct(product)
+      } catch (error) {
+        console.error('Error auto-saving product to Firestore:', error)
+      }
+    }, 1000) // Debounce for 1 second
+
+    return () => clearTimeout(timeoutId)
+  }, [product, user?.uid, isLoadingFromFirestore, lastSyncedProduct])
 
   const setProduct = (updates) => {
     setProductState((prev) => {
@@ -104,15 +174,33 @@ export function ProductProvider({ children }) {
     })
   }
 
-  const clearProduct = () => {
+  const clearProduct = async () => {
     setProductState(defaultProduct)
     try { localStorage.removeItem(STORAGE_KEY) } catch (_) {}
+    
+    // Also clear from Firestore
+    if (user?.uid) {
+      try {
+        await saveUserProductContext(user.uid, defaultProduct)
+        setLastSyncedProduct(defaultProduct)
+      } catch (error) {
+        console.error('Error clearing product from Firestore:', error)
+      }
+    }
   }
 
   const hasProduct = Boolean(product.productName?.trim())
 
   return (
-    <ProductContext.Provider value={{ product, setProduct, clearProduct, hasProduct }}>
+    <ProductContext.Provider 
+      value={{ 
+        product, 
+        setProduct, 
+        clearProduct, 
+        hasProduct,
+        isLoadingFromFirestore 
+      }}
+    >
       {children}
     </ProductContext.Provider>
   )

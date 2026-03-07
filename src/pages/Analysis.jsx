@@ -10,6 +10,7 @@ import { useProduct } from '../context/ProductContext'
 import { db } from '../firebase/firebaseConfig'
 import { analyzeProduct } from '../services/aiApi'
 import { saveCache, loadCache, CACHE_TYPES } from '../services/cacheService'
+import { saveAnalysisToHistory } from '../firebase/firestoreService'
 import {
   LineChart,
   Line,
@@ -133,19 +134,20 @@ export default function Analysis() {
       saveCache(product.productName, CACHE_TYPES.ANALYSIS, data)
 
       if (user && db) {
-        await addDoc(collection(db, 'analyses'), {
-          userId: user.uid,
+        // Save using new consistent method
+        await saveAnalysisToHistory(user.uid, {
           productName: product.productName,
-          product_name: product.productName,
-          category: product.category,
           sentimentScore: Math.round(data?.sentiment_analysis?.overall_score || 0),
           competitorScore: Math.min(95, Math.max(30, Math.round((data?.sentiment_analysis?.overall_score || 50) - 5))),
-          avgRating: Math.min(5, Math.max(1, Number(((data?.sentiment_analysis?.overall_score || 50) / 20).toFixed(1)))),
-          totalReviews: data?.sentiment_analysis?.total_reviews || 0,
-          aiInsights: data?.ai_insights?.insights_text || '',
-          extractedFeatures: data?.feature_analysis?.extracted_features || [],
-          sentimentDistribution: data?.sentiment_analysis?.distribution || {},
-          createdAt: serverTimestamp(),
+          insights: insightLines,
+          features: data?.feature_analysis?.extracted_features || [],
+          metadata: {
+            type: 'analysis',
+            avgRating: Math.min(5, Math.max(1, Number(((data?.sentiment_analysis?.overall_score || 50) / 20).toFixed(1)))),
+            totalReviews: data?.sentiment_analysis?.total_reviews || 0,
+            category: product.category,
+            sentimentDistribution: data?.sentiment_analysis?.distribution || {},
+          },
         })
       }
     } catch (err) {
