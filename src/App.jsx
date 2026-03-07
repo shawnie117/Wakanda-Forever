@@ -15,6 +15,9 @@ import Comparison from './pages/Comparison'
 import Insights from './pages/Insights'
 import AIAssistant from './pages/AIAssistant'
 import MyAnalyses from './pages/MyAnalyses'
+import MarketRadar from './pages/MarketRadar'
+import CompanySetup from './pages/CompanySetup'
+import AddProduct from './pages/AddProduct'
 
 function App() {
   const [isLoading, setIsLoading] = useState(true)
@@ -42,6 +45,16 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
 
+              {/* Company Setup Route - requires login but NOT company profile */}
+              <Route
+                path="/company-setup"
+                element={
+                  <ProtectedRoute requireProfile={false}>
+                    <CompanySetup />
+                  </ProtectedRoute>
+                }
+              />
+
               {/* Protected Routes */}
               <Route
                 path="/dashboard"
@@ -53,6 +66,14 @@ function App() {
               />
               <Route
                 path="/analyze"
+                element={
+                  <ProtectedRoute>
+                    <Analysis />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/analysis/:productId"
                 element={
                   <ProtectedRoute>
                     <Analysis />
@@ -84,10 +105,26 @@ function App() {
                 }
               />
               <Route
+                path="/market-radar"
+                element={
+                  <ProtectedRoute>
+                    <MarketRadar />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/my-analyses"
                 element={
                   <ProtectedRoute>
                     <MyAnalyses />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/add-product"
+                element={
+                  <ProtectedRoute>
+                    <AddProduct />
                   </ProtectedRoute>
                 }
               />

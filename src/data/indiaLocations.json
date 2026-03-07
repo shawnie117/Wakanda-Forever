@@ -1,0 +1,274 @@
+{
+  "India": {
+    "Andhra Pradesh": [
+      "Hyderabad",
+      "Visakhapatnam",
+      "Vijayawada",
+      "Guntur",
+      "Nellore",
+      "Tirupati",
+      "Kakinada"
+    ],
+    "Arunachal Pradesh": [
+      "Itanagar",
+      "Naharlagun",
+      "Papum Pare"
+    ],
+    "Assam": [
+      "Guwahati",
+      "Silchar",
+      "Dibrugarh",
+      "Nagaon",
+      "Tinsukia"
+    ],
+    "Bihar": [
+      "Patna",
+      "Gaya",
+      "Bhagalpur",
+      "Muzaffarpur",
+      "Darbhanga",
+      "Purnia"
+    ],
+    "Chhattisgarh": [
+      "Raipur",
+      "Bilaspur",
+      "Durg",
+      "Rajnandgaon",
+      "Bhilai"
+    ],
+    "Goa": [
+      "Panaji",
+      "Margao",
+      "Vasco da Gama",
+      "Ponda"
+    ],
+    "Gujarat": [
+      "Ahmedabad",
+      "Surat",
+      "Vadodara",
+      "Rajkot",
+      "Jamnagar",
+      "Junagadh",
+      "Gandhinagar"
+    ],
+    "Haryana": [
+      "Faridabad",
+      "Gurgaon",
+      "Hisar",
+      "Rohtak",
+      "Karnal",
+      "Ambala",
+      "Panipat"
+    ],
+    "Himachal Pradesh": [
+      "Shimla",
+      "Solan",
+      "Kangra",
+      "Mandi",
+      "Kullu"
+    ],
+    "Jharkhand": [
+      "Ranchi",
+      "Dhanbad",
+      "Jamshedpur",
+      "Giridih",
+      "Bokaro",
+      "Hazaribag"
+    ],
+    "Karnataka": [
+      "Bangalore",
+      "Mysore",
+      "Mangalore",
+      "Hubli",
+      "Belgaum",
+      "Shimoga",
+      "Davangere",
+      "Tumkur",
+      "Gulbarga",
+      "Udupi"
+    ],
+    "Kerala": [
+      "Kochi",
+      "Thiruvananthapuram",
+      "Kozhikode",
+      "Kottayam",
+      "Ernakulam",
+      "Alappuzha",
+      "Thrissur"
+    ],
+    "Madhya Pradesh": [
+      "Indore",
+      "Bhopal",
+      "Jabalpur",
+      "Gwalior",
+      "Ujjain",
+      "Sagar",
+      "Dewas"
+    ],
+    "Maharashtra": [
+      "Mumbai",
+      "Pune",
+      "Nagpur",
+      "Thane",
+      "Aurangabad",
+      "Solapur",
+      "Nashik",
+      "Amravati",
+      "Kolhapur",
+      "Satara"
+    ],
+    "Manipur": [
+      "Imphal",
+      "Thoubal",
+      "Bishnupur"
+    ],
+    "Meghalaya": [
+      "Shillong",
+      "Tura",
+      "Jowai"
+    ],
+    "Mizoram": [
+      "Aizawl",
+      "Lunglei",
+      "Saiha"
+    ],
+    "Nagaland": [
+      "Kohima",
+      "Dimapur",
+      "Mokokchung"
+    ],
+    "Odisha": [
+      "Bhubaneswar",
+      "Cuttack",
+      "Rourkela",
+      "Berhampur",
+      "Sambalpur",
+      "Balasore"
+    ],
+    "Punjab": [
+      "Chandigarh",
+      "Amritsar",
+      "Ludhiana",
+      "Jalandhar",
+      "Patiala",
+      "Bathinda",
+      "Mohali"
+    ],
+    "Rajasthan": [
+      "Jaipur",
+      "Jodhpur",
+      "Udaipur",
+      "Ajmer",
+      "Bikaner",
+      "Alwar",
+      "Kota",
+      "Barmer",
+      "Sikar"
+    ],
+    "Sikkim": [
+      "Gangtok",
+      "Namchi",
+      "Geyzing"
+    ],
+    "Tamil Nadu": [
+      "Chennai",
+      "Coimbatore",
+      "Madurai",
+      "Salem",
+      "Tiruppur",
+      "Erode",
+      "Dindigul",
+      "Kanyakumari",
+      "Nagercoil",
+      "Tirunelveli"
+    ],
+    "Telangana": [
+      "Hyderabad",
+      "Warangal",
+      "Nizamabad",
+      "Khammam",
+      "Mahbubnagar",
+      "Karimnagar",
+      "Ramagundam"
+    ],
+    "Tripura": [
+      "Agartala",
+      "Udaipur",
+      "Ambassa"
+    ],
+    "Uttar Pradesh": [
+      "Lucknow",
+      "Kanpur",
+      "Ghaziabad",
+      "Agra",
+      "Varanasi",
+      "Meerut",
+      "Allahabad",
+      "Noida",
+      "Moradabad",
+      "Bareilly"
+    ],
+    "Uttarakhand": [
+      "Dehradun",
+      "Haridwar",
+      "Haldwani",
+      "Rishikesh",
+      "Almora",
+      "Nainital"
+    ],
+    "West Bengal": [
+      "Kolkata",
+      "Asansol",
+      "Siliguri",
+      "Durgapur",
+      "Darjeeling",
+      "Hooghly",
+      "West Midnapore"
+    ],
+    "Delhi": [
+      "New Delhi",
+      "Delhi",
+      "North Delhi",
+      "South Delhi",
+      "East Delhi",
+      "West Delhi"
+    ]
+  },
+  "USA": {
+    "California": ["Los Angeles", "San Francisco", "San Diego", "Sacramento", "Fresno"],
+    "Texas": ["Houston", "Dallas", "Austin", "San Antonio", "Fort Worth"],
+    "New York": ["New York City", "Buffalo", "Rochester", "Syracuse", "Albany"],
+    "Florida": ["Miami", "Tampa", "Orlando", "Jacksonville", "Fort Lauderdale"],
+    "Illinois": ["Chicago", "Aurora", "Rockford", "Joliet", "Naperville"]
+  },
+  "UK": {
+    "England": ["London", "Manchester", "Birmingham", "Leeds", "Liverpool", "Greenwich"],
+    "Scotland": ["Edinburgh", "Glasgow", "Aberdeen", "Dundee"],
+    "Wales": ["Cardiff", "Swansea", "Newport"],
+    "Northern Ireland": ["Belfast", "Derry", "Lisburn"]
+  },
+  "Canada": {
+    "Ontario": ["Toronto", "Ottawa", "Hamilton", "London", "Windsor"],
+    "Quebec": ["Montreal", "Quebec City", "Gatineau", "Laval"],
+    "British Columbia": ["Vancouver", "Victoria", "Surrey", "Burnaby"],
+    "Alberta": ["Calgary", "Edmonton", "Red Deer"],
+    "Manitoba": ["Winnipeg", "Brandon"],
+    "Saskatchewan": ["Saskatoon", "Regina"]
+  },
+  "Australia": {
+    "New South Wales": ["Sydney", "Newcastle", "Wollongong", "Central Coast"],
+    "Victoria": ["Melbourne", "Geelong", "Ballarat", "Bendigo"],
+    "Queensland": ["Brisbane", "Gold Coast", "Sunshine Coast", "Cairns"],
+    "Western Australia": ["Perth", "Fremantle", "Mandurah"],
+    "South Australia": ["Adelaide", "Mount Gambier", "Port Pirie"],
+    "Tasmania": ["Hobart", "Launceston", "Devonport"]
+  },
+  "UAE": {
+    "Dubai": ["Dubai City", "Deira", "Bur Dubai", "Jumeirah", "Downtown Dubai"],
+    "Abu Dhabi": ["Abu Dhabi City", "Al Ain", "Mussafah", "Yas Island"],
+    "Sharjah": ["Sharjah City", "Al Qasimia", "Al Nahda"],
+    "Ajman": ["Ajman City", "Masfout"],
+    "Ras Al Khaimah": ["Ras Al Khaimah City"],
+    "Umm Al Quwain": ["Umm Al Quwain City"]
+  }
+}

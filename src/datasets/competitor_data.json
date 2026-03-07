@@ -1,0 +1,32 @@
+[
+  {
+    "region": "Karnataka",
+    "leaderBrand": "Samsung",
+    "leaderStrength": "Strong battery perception and broad retail distribution.",
+    "vibraniumStatus": "Emerging"
+  },
+  {
+    "region": "Telangana",
+    "leaderBrand": "Samsung",
+    "leaderStrength": "Consistent value positioning in mid-range devices.",
+    "vibraniumStatus": "Emerging"
+  },
+  {
+    "region": "Maharashtra",
+    "leaderBrand": "Samsung",
+    "leaderStrength": "High visibility and broad financing partnerships.",
+    "vibraniumStatus": "Trailing"
+  },
+  {
+    "region": "Tamil Nadu",
+    "leaderBrand": "Samsung",
+    "leaderStrength": "Balanced portfolio and strong brand trust.",
+    "vibraniumStatus": "Emerging"
+  },
+  {
+    "region": "Delhi NCR",
+    "leaderBrand": "Samsung",
+    "leaderStrength": "High campaign frequency and channel dominance.",
+    "vibraniumStatus": "Trailing"
+  }
+]

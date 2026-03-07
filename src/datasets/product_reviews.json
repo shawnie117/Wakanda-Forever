@@ -1,0 +1,42 @@
+[
+  {
+    "region": "Karnataka",
+    "summary": "Customers in Karnataka prefer Samsung devices for battery life and stable after-sales service.",
+    "preferences": ["Battery life", "Service network", "Value pricing"],
+    "opportunity": "Mid-premium users in Bengaluru are open to switching if camera quality improves.",
+    "recommendation": "Run creator-focused campaigns in Bengaluru and Mysuru.",
+    "lowCompetitorCity": "Mysuru"
+  },
+  {
+    "region": "Telangana",
+    "summary": "Demand in Telangana is price-sensitive with strong uptake in feature-rich mid-range devices.",
+    "preferences": ["Affordable pricing", "Smooth UI", "Fast charging"],
+    "opportunity": "Competitor presence is lower in Warangal for premium accessories bundles.",
+    "recommendation": "Increase digital ad spend in Hyderabad and test city-specific bundles in Warangal.",
+    "lowCompetitorCity": "Warangal"
+  },
+  {
+    "region": "Maharashtra",
+    "summary": "Maharashtra skews toward premium and aspirational brands, especially in Mumbai and Pune.",
+    "preferences": ["Brand value", "Performance", "Camera"],
+    "opportunity": "There is room to grow in Nagpur where premium competition is softer.",
+    "recommendation": "Position Vibranium One as performance-first with exchange offers.",
+    "lowCompetitorCity": "Nagpur"
+  },
+  {
+    "region": "Tamil Nadu",
+    "summary": "Tamil Nadu shows strong conversion when product messaging emphasizes reliability and localized support.",
+    "preferences": ["Reliability", "Localized support", "Battery life"],
+    "opportunity": "Coimbatore has high intent for value-premium devices.",
+    "recommendation": "Partner with regional retail chains and push localized language creatives.",
+    "lowCompetitorCity": "Coimbatore"
+  },
+  {
+    "region": "Delhi NCR",
+    "summary": "Delhi NCR has high competitor saturation but strong demand for launch offers and ecosystem bundles.",
+    "preferences": ["Launch offers", "Ecosystem compatibility", "Performance"],
+    "opportunity": "Noida can be targeted with student-focused bundles and EMI options.",
+    "recommendation": "Deploy high-frequency campaigns tied to festival windows.",
+    "lowCompetitorCity": "Noida"
+  }
+]

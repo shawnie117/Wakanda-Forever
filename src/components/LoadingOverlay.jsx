@@ -8,9 +8,7 @@ export default function LoadingOverlay({ fullscreen = false, subtitle = 'INITIAL
     : 'absolute inset-0 z-40 rounded-2xl'
 
   return (
-    <div className={`${containerClass} flex items-center justify-center bg-black/60 backdrop-blur-sm`}>
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(168,85,247,0.18),transparent_62%)]" />
-      <div className="pointer-events-none absolute inset-0 opacity-20 bg-[linear-gradient(rgba(168,85,247,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(168,85,247,0.14)_1px,transparent_1px)] bg-[size:38px_38px]" />
+    <div className={`${containerClass} flex items-center justify-center bg-transparent`}>
 
       <motion.div
         initial={{ opacity: 0, y: 8 }}

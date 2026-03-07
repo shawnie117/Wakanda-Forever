@@ -1,0 +1,51 @@
+[
+  {"region":"Karnataka","city":"Bengaluru","timeRange":"Q1 2026","category":"Electronics","product":"Vibranium One","brand":"Vibranium","companyType":"your","sales":2450,"revenue":612500,"marketShare":24,"sentiment":75},
+  {"region":"Karnataka","city":"Bengaluru","timeRange":"Q1 2026","category":"Electronics","product":"Samsung Galaxy M35","brand":"Samsung","companyType":"competitor","sales":4200,"revenue":1050000,"marketShare":42,"sentiment":82},
+  {"region":"Karnataka","city":"Bengaluru","timeRange":"Q1 2026","category":"Electronics","product":"iPhone 13","brand":"Apple","companyType":"competitor","sales":3100,"revenue":930000,"marketShare":31,"sentiment":79},
+  {"region":"Karnataka","city":"Mysuru","timeRange":"Q1 2026","category":"Electronics","product":"Redmi Note 12","brand":"Xiaomi","companyType":"competitor","sales":1900,"revenue":342000,"marketShare":19,"sentiment":71},
+
+  {"region":"Karnataka","city":"Bengaluru","timeRange":"Q2 2026","category":"Electronics","product":"Vibranium One","brand":"Vibranium","companyType":"your","sales":2860,"revenue":715000,"marketShare":27,"sentiment":78},
+  {"region":"Karnataka","city":"Bengaluru","timeRange":"Q2 2026","category":"Electronics","product":"Samsung Galaxy M35","brand":"Samsung","companyType":"competitor","sales":4380,"revenue":1095000,"marketShare":41,"sentiment":83},
+  {"region":"Karnataka","city":"Bengaluru","timeRange":"Q2 2026","category":"Electronics","product":"iPhone 13","brand":"Apple","companyType":"competitor","sales":3220,"revenue":966000,"marketShare":30,"sentiment":80},
+  {"region":"Karnataka","city":"Mysuru","timeRange":"Q2 2026","category":"Electronics","product":"Redmi Note 12","brand":"Xiaomi","companyType":"competitor","sales":2050,"revenue":369000,"marketShare":20,"sentiment":73},
+
+  {"region":"Telangana","city":"Hyderabad","timeRange":"Q1 2026","category":"Electronics","product":"Vibranium One","brand":"Vibranium","companyType":"your","sales":1980,"revenue":495000,"marketShare":21,"sentiment":74},
+  {"region":"Telangana","city":"Hyderabad","timeRange":"Q1 2026","category":"Electronics","product":"Samsung Galaxy M35","brand":"Samsung","companyType":"competitor","sales":3320,"revenue":830000,"marketShare":36,"sentiment":80},
+  {"region":"Telangana","city":"Hyderabad","timeRange":"Q1 2026","category":"Electronics","product":"iPhone 13","brand":"Apple","companyType":"competitor","sales":2620,"revenue":786000,"marketShare":28,"sentiment":77},
+  {"region":"Telangana","city":"Warangal","timeRange":"Q1 2026","category":"Electronics","product":"Redmi Note 12","brand":"Xiaomi","companyType":"competitor","sales":2230,"revenue":401400,"marketShare":24,"sentiment":72},
+
+  {"region":"Telangana","city":"Hyderabad","timeRange":"Q2 2026","category":"Electronics","product":"Vibranium One","brand":"Vibranium","companyType":"your","sales":2440,"revenue":610000,"marketShare":25,"sentiment":77},
+  {"region":"Telangana","city":"Hyderabad","timeRange":"Q2 2026","category":"Electronics","product":"Samsung Galaxy M35","brand":"Samsung","companyType":"competitor","sales":3510,"revenue":877500,"marketShare":35,"sentiment":81},
+  {"region":"Telangana","city":"Hyderabad","timeRange":"Q2 2026","category":"Electronics","product":"iPhone 13","brand":"Apple","companyType":"competitor","sales":2710,"revenue":813000,"marketShare":27,"sentiment":78},
+  {"region":"Telangana","city":"Warangal","timeRange":"Q2 2026","category":"Electronics","product":"Redmi Note 12","brand":"Xiaomi","companyType":"competitor","sales":2360,"revenue":424800,"marketShare":24,"sentiment":73},
+
+  {"region":"Maharashtra","city":"Mumbai","timeRange":"Q1 2026","category":"Electronics","product":"Vibranium One","brand":"Vibranium","companyType":"your","sales":2120,"revenue":530000,"marketShare":18,"sentiment":72},
+  {"region":"Maharashtra","city":"Mumbai","timeRange":"Q1 2026","category":"Electronics","product":"Samsung Galaxy M35","brand":"Samsung","companyType":"competitor","sales":5010,"revenue":1252500,"marketShare":43,"sentiment":84},
+  {"region":"Maharashtra","city":"Pune","timeRange":"Q1 2026","category":"Electronics","product":"iPhone 13","brand":"Apple","companyType":"competitor","sales":3480,"revenue":1044000,"marketShare":30,"sentiment":80},
+  {"region":"Maharashtra","city":"Nagpur","timeRange":"Q1 2026","category":"Electronics","product":"Redmi Note 12","brand":"Xiaomi","companyType":"competitor","sales":2140,"revenue":385200,"marketShare":18,"sentiment":70},
+
+  {"region":"Maharashtra","city":"Mumbai","timeRange":"Q2 2026","category":"Electronics","product":"Vibranium One","brand":"Vibranium","companyType":"your","sales":2470,"revenue":617500,"marketShare":20,"sentiment":74},
+  {"region":"Maharashtra","city":"Mumbai","timeRange":"Q2 2026","category":"Electronics","product":"Samsung Galaxy M35","brand":"Samsung","companyType":"competitor","sales":5250,"revenue":1312500,"marketShare":42,"sentiment":84},
+  {"region":"Maharashtra","city":"Pune","timeRange":"Q2 2026","category":"Electronics","product":"iPhone 13","brand":"Apple","companyType":"competitor","sales":3590,"revenue":1077000,"marketShare":29,"sentiment":81},
+  {"region":"Maharashtra","city":"Nagpur","timeRange":"Q2 2026","category":"Electronics","product":"Redmi Note 12","brand":"Xiaomi","companyType":"competitor","sales":2280,"revenue":410400,"marketShare":18,"sentiment":72},
+
+  {"region":"Tamil Nadu","city":"Chennai","timeRange":"Q1 2026","category":"Electronics","product":"Vibranium One","brand":"Vibranium","companyType":"your","sales":2640,"revenue":660000,"marketShare":28,"sentiment":79},
+  {"region":"Tamil Nadu","city":"Chennai","timeRange":"Q1 2026","category":"Electronics","product":"Samsung Galaxy M35","brand":"Samsung","companyType":"competitor","sales":3560,"revenue":890000,"marketShare":37,"sentiment":81},
+  {"region":"Tamil Nadu","city":"Coimbatore","timeRange":"Q1 2026","category":"Electronics","product":"iPhone 13","brand":"Apple","companyType":"competitor","sales":2580,"revenue":774000,"marketShare":27,"sentiment":78},
+  {"region":"Tamil Nadu","city":"Madurai","timeRange":"Q1 2026","category":"Electronics","product":"Redmi Note 12","brand":"Xiaomi","companyType":"competitor","sales":1880,"revenue":338400,"marketShare":19,"sentiment":71},
+
+  {"region":"Tamil Nadu","city":"Chennai","timeRange":"Q2 2026","category":"Electronics","product":"Vibranium One","brand":"Vibranium","companyType":"your","sales":3020,"revenue":755000,"marketShare":31,"sentiment":81},
+  {"region":"Tamil Nadu","city":"Chennai","timeRange":"Q2 2026","category":"Electronics","product":"Samsung Galaxy M35","brand":"Samsung","companyType":"competitor","sales":3630,"revenue":907500,"marketShare":36,"sentiment":82},
+  {"region":"Tamil Nadu","city":"Coimbatore","timeRange":"Q2 2026","category":"Electronics","product":"iPhone 13","brand":"Apple","companyType":"competitor","sales":2660,"revenue":798000,"marketShare":26,"sentiment":79},
+  {"region":"Tamil Nadu","city":"Madurai","timeRange":"Q2 2026","category":"Electronics","product":"Redmi Note 12","brand":"Xiaomi","companyType":"competitor","sales":1950,"revenue":351000,"marketShare":19,"sentiment":72},
+
+  {"region":"Delhi NCR","city":"New Delhi","timeRange":"Q1 2026","category":"Electronics","product":"Vibranium One","brand":"Vibranium","companyType":"your","sales":1720,"revenue":430000,"marketShare":16,"sentiment":70},
+  {"region":"Delhi NCR","city":"New Delhi","timeRange":"Q1 2026","category":"Electronics","product":"Samsung Galaxy M35","brand":"Samsung","companyType":"competitor","sales":4180,"revenue":1045000,"marketShare":39,"sentiment":82},
+  {"region":"Delhi NCR","city":"Gurugram","timeRange":"Q1 2026","category":"Electronics","product":"iPhone 13","brand":"Apple","companyType":"competitor","sales":3480,"revenue":1044000,"marketShare":32,"sentiment":80},
+  {"region":"Delhi NCR","city":"Noida","timeRange":"Q1 2026","category":"Electronics","product":"Redmi Note 12","brand":"Xiaomi","companyType":"competitor","sales":1760,"revenue":316800,"marketShare":13,"sentiment":68},
+
+  {"region":"Delhi NCR","city":"New Delhi","timeRange":"Q2 2026","category":"Electronics","product":"Vibranium One","brand":"Vibranium","companyType":"your","sales":1950,"revenue":487500,"marketShare":18,"sentiment":72},
+  {"region":"Delhi NCR","city":"New Delhi","timeRange":"Q2 2026","category":"Electronics","product":"Samsung Galaxy M35","brand":"Samsung","companyType":"competitor","sales":4290,"revenue":1072500,"marketShare":38,"sentiment":83},
+  {"region":"Delhi NCR","city":"Gurugram","timeRange":"Q2 2026","category":"Electronics","product":"iPhone 13","brand":"Apple","companyType":"competitor","sales":3560,"revenue":1068000,"marketShare":31,"sentiment":81},
+  {"region":"Delhi NCR","city":"Noida","timeRange":"Q2 2026","category":"Electronics","product":"Redmi Note 12","brand":"Xiaomi","companyType":"competitor","sales":1820,"revenue":327600,"marketShare":13,"sentiment":69}
+]

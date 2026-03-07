@@ -16,6 +16,7 @@ export default function Navbar() {
     { name: 'Dashboard', path: '/dashboard' },
     { name: 'Analyze', path: '/analyze' },
     { name: 'Compare', path: '/compare' },
+    { name: 'Market Radar', path: '/market-radar' },
     { name: 'Insights', path: '/insights' },
     { name: 'AI Assistant', path: '/assistant' },
   ]

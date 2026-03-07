@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
+import { addDoc, collection, doc, getDoc, serverTimestamp } from 'firebase/firestore'
+import { useParams } from 'react-router-dom'
 import { Search, Star, MessageSquare, TrendingUp, Award, ChevronDown, Loader } from 'lucide-react'
 import AnalyticsCard from '../components/AnalyticsCard'
 import GlassCard from '../components/GlassCard'
@@ -48,14 +49,66 @@ const itemVariants = {
 }
 
 export default function Analysis() {
+  const { productId } = useParams()
   const { user } = useAuth()
   const [productName, setProductName] = useState('')
   const [category, setCategory] = useState('Electronics')
   const [sentimentScore, setSentimentScore] = useState(88)
   const [competitorScore, setCompetitorScore] = useState(65)
   const [loading, setLoading] = useState(false)
+  const [productLoading, setProductLoading] = useState(false)
+  const [productError, setProductError] = useState('')
+  const [selectedProduct, setSelectedProduct] = useState(null)
 
   const categories = ['Electronics', 'Software', 'Services', 'Fashion', 'Home & Garden']
+
+  useEffect(() => {
+    async function fetchProductById() {
+      if (!productId) {
+        setSelectedProduct(null)
+        setProductError('')
+        return
+      }
+
+      setProductLoading(true)
+      setProductError('')
+      try {
+        const productRef = doc(db, 'products', productId)
+        const productSnapshot = await getDoc(productRef)
+
+        if (!productSnapshot.exists()) {
+          setProductError('Product not found for this analysis link.')
+          setSelectedProduct(null)
+          return
+        }
+
+        const productData = { id: productSnapshot.id, ...productSnapshot.data() }
+        setSelectedProduct(productData)
+        setProductName(productData.productName || '')
+        setCategory(productData.category || 'Electronics')
+
+        // Deterministic baseline for product-linked analysis view.
+        const seed = productData.id
+          .split('')
+          .reduce((acc, char) => acc + char.charCodeAt(0), 0)
+        setSentimentScore(60 + (seed % 31))
+        setCompetitorScore(45 + (seed % 36))
+      } catch (err) {
+        console.error('Error fetching product:', err)
+        setProductError('Unable to load product details for analysis.')
+        setSelectedProduct(null)
+      } finally {
+        setProductLoading(false)
+      }
+    }
+
+    fetchProductById()
+  }, [productId])
+
+  const platforms = useMemo(
+    () => (Array.isArray(selectedProduct?.platforms) ? selectedProduct.platforms : []),
+    [selectedProduct]
+  )
 
   const handleAnalyze = async () => {
     if (!productName.trim()) {
@@ -77,7 +130,11 @@ export default function Analysis() {
       if (user) {
         await addDoc(collection(db, 'analyses'), {
           userId: user.uid,
+          productId: selectedProduct?.id || null,
           productName: productName,
+          category,
+          primaryMarket: selectedProduct?.primaryMarket || '',
+          platformsCount: platforms.length,
           sentimentScore: newSentiment,
           competitorScore: newCompetitor,
           createdAt: serverTimestamp(),
@@ -98,6 +155,68 @@ export default function Analysis() {
       transition={{ duration: 0.5 }}
       className="container mx-auto px-4 md:px-6 py-12"
     >
+      {productLoading && (
+        <div className="mb-8 p-4 bg-slate-900/50 border border-slate-700/40 rounded-xl flex items-center gap-3 text-slate-300">
+          <Loader size={18} className="animate-spin text-purple-400" />
+          Loading product details...
+        </div>
+      )}
+
+      {productError && (
+        <div className="mb-8 p-4 bg-red-500/20 border border-red-500/50 rounded-xl text-red-300 text-sm">
+          {productError}
+        </div>
+      )}
+
+      {selectedProduct && (
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="mb-10"
+        >
+          <motion.div variants={itemVariants}>
+            <GlassCard className="p-6">
+              <h3 className="text-xl font-bold text-white mb-4">Product Context</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                <div className="flex justify-between border-b border-white/10 pb-2">
+                  <span className="text-slate-400">Product Name</span>
+                  <span className="text-slate-100">{selectedProduct.productName || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between border-b border-white/10 pb-2">
+                  <span className="text-slate-400">Category</span>
+                  <span className="text-slate-100">{selectedProduct.category || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between border-b border-white/10 pb-2">
+                  <span className="text-slate-400">Primary Market</span>
+                  <span className="text-slate-100">{selectedProduct.primaryMarket || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between border-b border-white/10 pb-2">
+                  <span className="text-slate-400">Platforms</span>
+                  <span className="text-purple-300 font-semibold">{platforms.length}</span>
+                </div>
+              </div>
+
+              {platforms.length > 0 && (
+                <div className="mt-4">
+                  <p className="text-slate-300 text-sm mb-2">Selling Platforms</p>
+                  <div className="flex flex-wrap gap-2">
+                    {platforms.map((platform, index) => (
+                      <span
+                        key={`${platform.platformName || 'platform'}-${index}`}
+                        className="px-2.5 py-1 bg-purple-500/15 border border-purple-400/30 rounded-full text-xs text-purple-200"
+                      >
+                        {platform.platformName || 'Platform'}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </GlassCard>
+          </motion.div>
+        </motion.div>
+      )}
+
       {/* Search Section */}
       <motion.div
         variants={containerVariants}
@@ -110,7 +229,9 @@ export default function Analysis() {
             Product Analysis
           </h1>
           <p className="text-gray-300 text-lg">
-            Enter a product name and select a category to analyze market sentiment and performance.
+            {selectedProduct
+              ? 'Loaded from dashboard selection. Re-run to refresh sentiment and AI insights.'
+              : 'Enter a product name and select a category to analyze market sentiment and performance.'}
           </p>
         </motion.div>
 
@@ -150,7 +271,7 @@ export default function Analysis() {
             disabled={loading}
             className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
           >
-            {loading ? <Loader size={20} className="animate-spin" /> : 'Analyze'}
+            {loading ? <Loader size={20} className="animate-spin" /> : selectedProduct ? 'Re-run Analysis' : 'Analyze'}
           </motion.button>
         </motion.div>
       </motion.div>

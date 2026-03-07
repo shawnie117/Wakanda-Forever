@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore'
 import { useAuth } from '../context/AuthContext'
 import { db } from '../firebase/firebaseConfig'
+import { getCompanyProfile, getProductsByCompany } from '../firebase/firestoreService'
 import GlassCard from '../components/GlassCard'
 import AnalyticsCard from '../components/AnalyticsCard'
 import LoadingOverlay from '../components/LoadingOverlay'
-import { ArrowRight, Zap, BarChart3, TrendingUp, Brain } from 'lucide-react'
+import { ArrowRight, Zap, BarChart3, TrendingUp, Brain, Plus } from 'lucide-react'
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -31,7 +32,10 @@ const itemVariants = {
 
 export default function Dashboard() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [analyses, setAnalyses] = useState([])
+  const [products, setProducts] = useState([])
+  const [company, setCompany] = useState(null)
   const [stats, setStats] = useState({
     totalAnalyses: 0,
     avgSentiment: 0,
@@ -44,6 +48,16 @@ export default function Dashboard() {
 
     const fetchData = async () => {
       try {
+        const companyProfile = await getCompanyProfile(user.uid)
+        setCompany(companyProfile)
+
+        if (companyProfile?.id) {
+          const companyProducts = await getProductsByCompany(companyProfile.id)
+          setProducts(companyProducts)
+        } else {
+          setProducts([])
+        }
+
         const q = query(
           collection(db, 'analyses'),
           where('userId', '==', user.uid),
@@ -273,6 +287,78 @@ export default function Dashboard() {
               </motion.div>
             </motion.div>
           )}
+
+          {/* Products Section */}
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="mt-16"
+          >
+            <motion.div variants={itemVariants} className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="font-neo tracking-[0.08em] text-sm uppercase text-slate-400 mb-2">
+                  Products
+                </h2>
+                <p className="text-slate-400 text-sm">
+                  {company?.companyName ? `Manage products for ${company.companyName}` : 'Manage your products'}
+                </p>
+              </div>
+              <button
+                onClick={() => navigate('/add-product')}
+                className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white text-sm font-medium flex items-center gap-2"
+              >
+                <Plus size={16} /> Add Product
+              </button>
+            </motion.div>
+
+            {products.length === 0 ? (
+              <motion.div variants={itemVariants}>
+                <GlassCard className="p-6 text-center">
+                  <p className="text-slate-300 mb-2">No products added yet.</p>
+                  <p className="text-slate-500 text-sm">Click "Add Product" to create your first product.</p>
+                </GlassCard>
+              </motion.div>
+            ) : (
+              <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              >
+                {products.map((product) => (
+                  <motion.div
+                    key={product.id}
+                    variants={itemVariants}
+                    onClick={() => navigate(`/analysis/${product.id}`)}
+                    className="cursor-pointer hover:scale-105 hover:shadow-purple-500/30 hover:shadow-lg transition-all duration-300"
+                  >
+                    <GlassCard className="p-6 h-full">
+                      <h3 className="text-lg font-bold text-white mb-2">{product.productName}</h3>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">Category</span>
+                          <span className="text-slate-200">{product.category || 'N/A'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">Primary Market</span>
+                          <span className="text-slate-200">{product.primaryMarket || 'N/A'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">Platforms</span>
+                          <span className="text-purple-300 font-semibold">
+                            {Array.isArray(product.platforms) ? product.platforms.length : 0}
+                          </span>
+                        </div>
+                      </div>
+                    </GlassCard>
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
+          </motion.div>
         </>
       )}
     </motion.main>
