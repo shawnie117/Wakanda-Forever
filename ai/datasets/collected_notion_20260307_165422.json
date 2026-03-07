@@ -1,0 +1,40 @@
+{
+  "product": "Notion",
+  "records": [
+    {
+      "product": "Notion",
+      "source": "HackerNews",
+      "review": "Docs – Open source alternative to Notion or Outline",
+      "date": "2025-03-16T11:38:52Z",
+      "region": "Global"
+    },
+    {
+      "product": "Notion",
+      "source": "HackerNews",
+      "review": "Notion for everyone",
+      "date": "2020-05-19T16:29:38Z",
+      "region": "Global"
+    },
+    {
+      "product": "Notion",
+      "source": "HackerNews",
+      "review": "Notion – All-in-one workspace for notes, tasks, wikis, and databases",
+      "date": "2019-01-14T17:33:16Z",
+      "region": "Global"
+    },
+    {
+      "product": "Notion",
+      "source": "HackerNews",
+      "review": "Focalboard – a self-hosted alternative to Trello, Notion, and Asana",
+      "date": "2021-03-18T02:06:26Z",
+      "region": "Global"
+    },
+    {
+      "product": "Notion",
+      "source": "HackerNews",
+      "review": "Hello HN,<p>I am building Docmost, an open-source collaborative wiki and documentation software.  \nIt is an open-source alternative to Confluence and Notion.<p>I have been working on it for the past 12 months. This is the first public release (beta).<p>The rich-text editor has support for real-time collaboration, LaTex, inline comments, tables, and callouts to name a few.<p>Features<p>- Collaborative real-time editor<p>- Spaces (Teamspace)<p>- User permissions<p>- Groups<p>- Comments<p>- Page history<p>- Nested pages<p>- Search<p>- File attachments<p>You can find screenshots of the product on the website.<p>Website: <a href=\"https:&#x2F;&#x2F;docmost.com\" rel=\"nofollow\">https:&#x2F;&#x2F;docmost.com</a><p>Github: <a href=\"https:&#x2F;&#x2F;github.com&#x2F;docmost&#x2F;docmost\">https:&#x2F;&#x2F;github.com&#x2F;docmost&#x2F;docmost</a><p>Documentation: <a href=\"https:&#x2F;&#x2F;docmost.com&#x2F;docs\" rel=\"nofollow\">https:&#x2F;&#x2F;docmost.com&#x2F;docs</a><p>I would love to hear your feedback.<p>Thank you.",
+      "date": "2024-06-29T17:27:58Z",
+      "region": "Global"
+    }
+  ]
+}

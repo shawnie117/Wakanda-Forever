@@ -1,0 +1,40 @@
+{
+  "product": "SaaS Product",
+  "records": [
+    {
+      "product": "SaaS Product",
+      "source": "HackerNews",
+      "review": "I wrote a SaaS product because the internet made me believe it'd make me rich",
+      "date": "2020-05-28T22:39:04Z",
+      "region": "Global"
+    },
+    {
+      "product": "SaaS Product",
+      "source": "HackerNews",
+      "review": "Open source alternatives to popular SaaS products",
+      "date": "2022-02-27T21:09:11Z",
+      "region": "Global"
+    },
+    {
+      "product": "SaaS Product",
+      "source": "HackerNews",
+      "review": "My experience releasing failed SaaS products",
+      "date": "2021-04-04T02:10:09Z",
+      "region": "Global"
+    },
+    {
+      "product": "SaaS Product",
+      "source": "HackerNews",
+      "review": "Principles for Building New SaaS Products on AWS",
+      "date": "2020-05-05T18:39:43Z",
+      "region": "Global"
+    },
+    {
+      "product": "SaaS Product",
+      "source": "HackerNews",
+      "review": "How to price your SaaS product",
+      "date": "2021-03-23T11:16:51Z",
+      "region": "Global"
+    }
+  ]
+}

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth'
-import { auth, provider } from '../firebase/firebaseConfig'
+import { auth, provider, isFirebaseConfigured, firebaseInitError } from '../firebase/firebaseConfig'
 import { Mail, Lock, Loader } from 'lucide-react'
 import PrimaryButton from '../components/PrimaryButton'
 
@@ -16,6 +16,16 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault()
     setError('')
+
+    if (!isFirebaseConfigured || !auth) {
+      setError(
+        firebaseInitError
+          ? `Firebase initialization failed: ${firebaseInitError.message}`
+          : 'Firebase is not configured. Add VITE_FIREBASE_* values in root .env file.'
+      )
+      return
+    }
+
     setLoading(true)
 
     try {
@@ -30,6 +40,16 @@ export default function Login() {
 
   const handleGoogleLogin = async () => {
     setError('')
+
+    if (!isFirebaseConfigured || !auth || !provider) {
+      setError(
+        firebaseInitError
+          ? `Firebase initialization failed: ${firebaseInitError.message}`
+          : 'Firebase is not configured. Add VITE_FIREBASE_* values in root .env file.'
+      )
+      return
+    }
+
     setLoading(true)
 
     try {

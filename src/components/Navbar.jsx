@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { signOut } from 'firebase/auth'
 import { Menu, X, LogOut, FileText } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
-import { auth } from '../firebase/firebaseConfig'
+import { auth, isFirebaseConfigured } from '../firebase/firebaseConfig'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -24,6 +24,11 @@ export default function Navbar() {
   ]
 
   const handleLogout = async () => {
+    if (!isFirebaseConfigured || !auth) {
+      navigate('/login')
+      return
+    }
+
     try {
       await signOut(auth)
       navigate('/login')

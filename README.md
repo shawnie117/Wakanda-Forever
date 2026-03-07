@@ -1,252 +1,374 @@
-# VIBRANIUM - AI SaaS Dashboard with Authentication
+# VIBRANIUM
 
-A modern, enterprise-grade AI SaaS dashboard with complete authentication system, built with React, Vite, Tailwind CSS, Framer Motion, Recharts, and Firebase.
+AI-powered SaaS product intelligence workspace with a React frontend, Firebase auth/data layer, and a FastAPI backend.
 
-## Features
+---
 
-- **Authentication System**
-  - Email/Password signup and login
-  - Google OAuth integration
-  - Secure session management with Firebase
-  - No hardcoded users or credentials
+## 1) Current App Overview (UI + Flow)
 
-- **Modern Dark AI Theme**
-  - Futuristic gradient background (#05010a → #3b0764)
-  - Glassmorphism UI components
-  - Smooth animations with Framer Motion
-  - Responsive design
+The app currently runs as a **multi-page authenticated SaaS intelligence dashboard**.
 
-- **Core Features**
-  - Product analysis with sentiment scoring
-  - Competitor comparison dashboard
-  - AI-powered insights and recommendations
-  - AI chat assistant for queries
-  - Save and view analysis history
-  - User-specific data isolation
+### Primary flow
+1. User logs in/signs up with Firebase.
+2. User creates a SaaS product profile in Setup Wizard.
+3. User opens Market Intelligence and runs analysis.
+4. User explores Product Health, Competitor Discovery, Insights, and AI Assistant.
+5. Data is saved/retrieved from Firestore collections.
 
-## Pages
+---
 
-1. **Login/Signup** - Secure authentication with email & Google
-2. **Dashboard** - Overview of analyses and quick access
-3. **Product Analysis** - Search products, view sentiment charts
-4. **Competitor Comparison** - Compare pricing, features, sentiment
-5. **Insights Dashboard** - Sentiment breakdown and recommendations
-6. **AI Assistant** - Chat interface for analysis questions
-7. **My Analyses** - View saved product analyses
+## 2) Tech Stack
 
-## Tech Stack
+### Frontend
+- React 18
+- Vite
+- Tailwind CSS
+- Framer Motion
+- Recharts
+- Lucide React icons
 
-- **React 18** - UI library
-- **Vite** - Build tool and dev server
-- **Tailwind CSS** - Utility-first CSS framework
-- **Framer Motion** - Animation library
-- **Recharts** - React charts library
-- **React Router DOM** - Client-side routing
-- **Lucide React** - Icon library
-- **Firebase** - Authentication & Database (Firestore)
+### Backend
+- FastAPI (`ai/api/main.py`)
+- Hosted Hugging Face inference support (optional token), with fallback generation
+- Model-free lexical/rule sentiment + feature extraction in backend pipeline
 
-## Getting Started
+### Data/Auth
+- Firebase Authentication (Email/Password + Google)
+- Firestore for product metadata, preferences, and analysis documents
 
-### Prerequisites
+---
 
-- Node.js 16+ and npm
-- Firebase project (free tier at https://firebase.google.com)
+## 3) Project Structure (Important UI Files)
 
-### Installation
-
-```bash
-# Install dependencies
-npm install
-
-# Copy environment template
-cp .env.example .env.local
-
-# Add your Firebase credentials to .env.local
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-```
-
-### Environment Variables
-
-Create `.env.local`:
-
-```
-VITE_FIREBASE_API_KEY=your_api_key_here
-VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=your_project_id
-VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
-VITE_FIREBASE_APP_ID=your_app_id
-```
-
-### Firebase Setup
-
-1. Create project at [https://firebase.google.com](https://firebase.google.com)
-2. Go to Project Settings → General
-3. Copy your Firebase config values to .env.local
-4. Enable Authentication:
-   - Authentication → Sign-in method
-   - Enable: Email/Password, Google
-5. Create Firestore Database:
-   - Firestore Database → Create Database (Start in test mode)
-   - Create collection named `analyses`
-
-### Firestore Collection Structure
-
-Collection: `analyses`
-
-Document fields:
-```json
-{
-  "userId": "firebase_uid",
-  "productName": "Camlin Scissors",
-  "sentimentScore": 78,
-  "competitorScore": 65,
-  "createdAt": "timestamp"
-}
-```
-
-## Project Structure
-
-```
+```text
 src/
-├── components/
-│   ├── Navbar.jsx
-│   ├── ProtectedRoute.jsx
-│   ├── GlassCard.jsx
-│   ├── AnalyticsCard.jsx
-│   └── ChartCard.jsx
-├── context/
-│   └── AuthContext.jsx
-├── firebase/
-│   └── firebaseConfig.js
-├── pages/
-│   ├── Login.jsx
-│   ├── Signup.jsx
-│   ├── Dashboard.jsx
-│   ├── Analysis.jsx
-│   ├── Comparison.jsx
-│   ├── Insights.jsx
-│   ├── AIAssistant.jsx
-│   └── MyAnalyses.jsx
-├── App.jsx
-├── main.jsx
-└── index.css
+  App.jsx
+  main.jsx
+  index.css
+  components/
+    Navbar.jsx
+    ProtectedRoute.jsx
+    GlassCard.jsx
+    AnalyticsCard.jsx
+    PrimaryButton.jsx
+    LoadingScreen.jsx
+    LoadingOverlay.jsx
+    ErrorBoundary.jsx
+    Footer.jsx
+  context/
+    AuthContext.jsx
+  firebase/
+    firebaseConfig.js
+    firestoreService.js
+  services/
+    aiApi.js
+  pages/
+    Login.jsx
+    Signup.jsx
+    Dashboard.jsx
+    SaaSProductSetup.jsx
+    MarketIntelligence.jsx
+    ProductHealth.jsx
+    CompetitorDiscovery.jsx
+    Insights.jsx
+    AIAssistant.jsx
+    MyAnalyses.jsx
+    Analysis.jsx        (legacy page file, not currently routed)
+    Comparison.jsx      (legacy page file, not currently routed)
 ```
 
-## Authentication Flow
+---
 
-### Sign Up
+## 4) Routes (Current)
+
+Defined in `src/App.jsx`.
+
+### Public routes
+- `/login`
+- `/signup`
+
+### Protected routes
+- `/dashboard`
+- `/saas-product-setup`
+- `/market-intelligence`
+- `/market-intelligence/:productId`
+- `/product-health`
+- `/competitor-discovery`
+- `/insights`
+- `/assistant`
+- `/my-analyses`
+
+### Redirect
+- `/` -> `/dashboard`
+
+---
+
+## 5) Navigation (Current Header)
+
+Navbar links (when authenticated):
+- Dashboard
+- Market Intelligence
+- Competitor Discovery
+- Product Health
+- Insights
+- AI Assistant
+
+Profile dropdown:
+- My Analyses
+- Logout
+
+---
+
+## 6) Page-by-Page UI + Data Coverage
+
+## Login (`/login`)
+- Email/password login form
+- Google OAuth button
+- Firebase config guard (shows error if env vars missing)
+- Redirect to `/dashboard` on success
+
+## Signup (`/signup`)
+- Name + email + password + confirm password
+- Password validation (match + min 6 chars)
+- Google OAuth signup
+- Success state then redirect to `/dashboard`
+
+## Dashboard (`/dashboard`)
+### Hero
+- Welcome header using user email prefix
+
+### Stats cards (from Firestore `analyses`)
+- Total Analyses
+- Avg Sentiment
+- Avg Competitor
+
+### Feature cards
+- Product Analysis (`/analyze`) **legacy link target**
+- Competitor Comparison (`/compare`) **legacy link target**
+- Strategic Insights (`/insights`)
+- AI Assistant (`/assistant`)
+
+### Recent analyses list
+- Product name
+- Sentiment score
+- Competitor score
+- Date
+
+## SaaS Product Setup (`/saas-product-setup`)
+7-step wizard:
+
+1. **Product Info**
+   - Product name (required)
+   - Website (required)
+   - Category
+   - Description
+   - Target customer segment
+
+2. **Positioning**
+   - Core problem
+   - Key feature tags
+   - UVP
+   - Business model
+   - Pricing tier range
+
+3. **Target Market**
+   - Region
+   - Industry tags
+   - Company size
+   - Primary user persona
+
+4. **Competitors**
+   - Known competitors
+   - Search keywords
+   - Alternative categories
+   - Search platform tags
+
+5. **Distribution**
+   - Platform name + product URL pairs
+
+6. **Analysis Preferences**
+   - Compare features
+   - Pricing benchmark
+   - Sentiment analysis
+   - Market gap detection
+   - Feature opportunity insights
+   - Positioning recommendations
+
+7. **Output Preferences**
+   - SWOT Analysis
+   - Competitive Matrix
+   - Feature Gap Report
+   - Pricing Optimization Suggestions
+   - Go-to-Market Strategy Feedback
+
+On submit, creates and links product documents in Firestore via `firestoreService.js`.
+
+## Market Intelligence (`/market-intelligence`)
+### Product context block
+- Category, business model, customer segment, pricing range
+- Key features tags
+- Known competitor tags
+
+### Action
+- `Run AI Analysis` button
+- If no product exists, redirects user to create one
+
+### Current analysis output sections
+- Key metrics: sentiment, market position, competitive advantage
+- Competitor Feature Comparison chart
+- Pricing Strategy Analysis chart
+- Market Gap Opportunities cards
+- SWOT Analysis (S/W/O/T lists)
+- AI Positioning Recommendations (title, description, action items)
+
+### Data source note
+Currently uses mock analysis payload in page logic, then saves to Firestore (`analysis_results`).
+
+## Product Health (`/product-health`)
+Static/mock KPI dashboard with:
+- DAU/MAU area chart
+- Revenue + ARPU line chart
+- Feature usage bar chart
+- KPI progress bars (retention, activation, CSAT, TTV, LTV)
+- Market performance summary cards
+
+## Competitor Discovery (`/competitor-discovery`)
+Static/mock discovery workspace:
+- Search box + selectable discovery platforms
+- SaaS positioning scatter chart (price vs complexity with market share bubble)
+- Discovered competitors list with pricing/users/rating/features
+- Market gap insight cards
+
+## Insights (`/insights`)
+Reads latest user analyses from Firestore and renders:
+- Sentiment Breakdown (pie)
+- Sentiment Trend (line)
+- Top Strengths
+- Top Complaints
+- AI Strategic Recommendations
+
+With fallback defaults when analysis history is absent.
+
+## AI Assistant (`/assistant`)
+- Chat UI with suggested prompts
+- Sends query to backend through `analyzeProduct()` using synthetic assistant context
+- Displays `ai_insights.insights_text` from backend response
+- Loading/typing animation + graceful failure message
+
+## My Analyses (`/my-analyses`)
+- Loads all analyses for logged-in user
+- Card list with date, sentiment score, competitor score
+- Empty state CTA: `Add SaaS Product`
+
+---
+
+## 7) Data Layer (Firestore Collections)
+
+Used by `src/firebase/firestoreService.js` and page code:
+
+- `saas_products`
+- `product_features`
+- `product_distribution`
+- `competitor_inputs`
+- `analysis_preferences`
+- `analysis_results`
+- `analyses` (legacy/alternate analysis cards used by multiple pages)
+
+---
+
+## 8) Environment Variables
+
+Use root `.env` (template in `.env.example`):
+
+```env
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+VITE_AI_API_URL=http://127.0.0.1:8000/api/v1
 ```
-User → Email/Password or Google OAuth → Firebase Auth → Dashboard
-```
 
-### Login
-```
-User → Email/Password or Google OAuth → Firebase Auth → Dashboard
-```
+Backend-specific env template exists in `ai/.env.example`.
 
-### Protected Routes
-```
-All dashboard pages redirect to login if not authenticated
-```
+---
 
-## User Data Management
+## 9) Run the Full App from Root Folder (Easy Mode)
 
-- **User ID**: Each user has unique UID from Firebase
-- **Analyses**: All analyses linked to userId field
-- **Firestore Rules**: Configure rules to restrict access
-- **Session**: Automatic token management by Firebase
+From `wakanda-forever` only:
 
-### Firestore Security Rules (Optional)
-
-```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /analyses/{document=**} {
-      allow read, write: if request.auth.uid == resource.data.userId;
-      allow create: if request.auth.uid == request.resource.data.userId;
-    }
-  }
-}
-```
-
-## Design System
-
-### Colors
-- **Primary**: Purple (#9333ea) and Pink (#ec4899)
-- **Background**: #05010a → #0f0018 → #1a0033 → #2a0050 → #3b0764
-- **Glass**: bg-white/5 with backdrop-blur-lg
-- **Border**: border-white/10
-
-### Components
-- **GlassCard**: Glassmorphism with hover animations
-- **AnalyticsCard**: Metric display with gradient text
-- **ProtectedRoute**: Authentication wrapper
-
-## Development
-
-### Run Dev Server
 ```bash
+npm install
+npm run setup:ai
 npm run dev
 ```
 
-### Build Production
+### Windows PowerShell note
+If your PowerShell policy blocks `npm`, use:
+
 ```bash
-npm run build
+npm.cmd run setup:ai
+npm.cmd run dev
 ```
 
-### Preview Build
+### What `npm run dev` does now
+- Starts Vite frontend (typically `http://localhost:5173`)
+- Starts FastAPI backend (`http://127.0.0.1:8000`)
+
+---
+
+## 10) Additional Scripts
+
 ```bash
+npm run dev:frontend   # frontend only
+npm run dev:backend    # backend only
+npm run build
 npm run preview
 ```
 
-## Deployment
+---
 
-### Vercel (Recommended)
-```bash
-npm run build
-# Push to GitHub and connect to Vercel
-```
+## 11) UI Design System Notes
 
-### Netlify
-```bash
-npm run build
-# Deploy dist folder to Netlify
-```
+Defined primarily in `src/index.css`:
+- Dark gradient futuristic background
+- Glassmorphism surfaces (`.glass`, `GlassCard`)
+- Purple/pink glow theme
+- Custom loading animations (`LoadingScreen`, `LoadingOverlay`)
 
-## Troubleshooting
+Footer brand: `VIBRANIUM — AI SaaS Intelligence Platform`.
 
-**Firebase connection errors**
-- Check .env.local exists with all Firebase credentials
-- Verify credentials match your Firebase project
-- Ensure Firestore database is created
+---
 
-**Google OAuth not working**
-- Enable Google provider in Firebase Authentication
-- Add authorized redirect domains in Firebase Console
-- Verify Google OAuth 2.0 credentials if using custom setup
+## 12) Current Code Reality Notes
 
-**Analyses not saving**
-- Verify user is logged in (check browser DevTools)
-- Check Firestore database has `analyses` collection
-- Review browser console for error messages
-- Verify Firestore rules allow write access
+1. **Dashboard feature cards still point to `/analyze` and `/compare`**
+   - Those routes are not registered in current `App.jsx`.
+   - `Analysis.jsx` and `Comparison.jsx` exist in code as legacy pages but are not active routes now.
 
-## License
+2. **Market Intelligence analysis block currently uses mock analysis payload**
+   - Saved to Firestore and rendered as real UI sections.
 
-MIT
+3. **Assistant depends on backend availability**
+   - If backend is down/misconfigured, assistant shows fallback error message in chat.
 
-## Resources
+---
 
-- [Firebase Docs](https://firebase.google.com/docs)
-- [Firestore Documentation](https://firebase.google.com/docs/firestore)
-- [React Router](https://reactrouter.com)
-- [Tailwind CSS](https://tailwindcss.com)
-- [Framer Motion](https://www.framer.com/motion)
-- [Recharts](https://recharts.org)
+## 13) Recommended Next Cleanup (Optional)
+
+- Wire `/analyze` and `/compare` routes or remove those Dashboard cards.
+- Replace Market Intelligence mock analysis with live backend pipeline call.
+- Add Firestore security rules for strict per-user data isolation in production.
+
+---
+
+## 14) Quick URLs
+
+- Frontend: `http://localhost:5173`
+- Backend API: `http://127.0.0.1:8000`
+- API docs: `http://127.0.0.1:8000/docs`
+
+---
+
+If you want, next I can generate a second file `README_UI_SPEC.md` that includes a **screen-by-screen field matrix** (every input, button, chart key, and data origin) for handoff/demo documentation.

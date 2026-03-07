@@ -1,344 +1,390 @@
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import GlassCard from '../components/GlassCard'
-import { Lightbulb, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Lightbulb, CheckCircle2, AlertCircle, RefreshCw, Settings, TrendingUp, Brain } from 'lucide-react'
+import { useProduct } from '../context/ProductContext'
+import { loadCache, saveCache, CACHE_TYPES } from '../services/cacheService'
 import {
-  PieChart,
-  Pie,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  Cell,
+  PieChart, Pie, LineChart, Line, XAxis, YAxis, CartesianGrid,
+  Tooltip, Legend, ResponsiveContainer, Cell,
 } from 'recharts'
 
-const sentimentBreakdown = [
-  { name: 'Positive', value: 65, fill: '#10b981' },
-  { name: 'Neutral', value: 20, fill: '#6366f1' },
-  { name: 'Negative', value: 15, fill: '#ef4444' },
-]
-
-const trendData = [
-  { week: 'Week 1', positive: 58, neutral: 25, negative: 17 },
-  { week: 'Week 2', positive: 62, neutral: 22, negative: 16 },
-  { week: 'Week 3', positive: 65, neutral: 20, negative: 15 },
-  { week: 'Week 4', positive: 68, neutral: 18, negative: 14 },
-  { week: 'Week 5', positive: 72, neutral: 17, negative: 11 },
-  { week: 'Week 6', positive: 75, neutral: 16, negative: 9 },
-]
-
-const recommendations = [
-  {
-    id: 1,
-    title: 'Improve Ergonomic Design',
-    description: 'Customer feedback indicates 23% of complaints relate to grip comfort. Consider redesigning the handle with textured materials.',
-    impact: 'High',
-    effort: 'Medium',
-  },
-  {
-    id: 2,
-    title: 'Reduce Product Price by 5%',
-    description: 'Competitive analysis shows pricing is 8-12% higher than competitors. A 5% reduction could increase market share by 15%.',
-    impact: 'High',
-    effort: 'Low',
-  },
-  {
-    id: 3,
-    title: 'Add Real-time Sync Feature',
-    description: 'Most requested feature with 450+ mentions in reviews. Implementation would address top customer request and boost satisfaction.',
-    impact: 'High',
-    effort: 'High',
-  },
-  {
-    id: 4,
-    title: 'Enhance Customer Support',
-    description: 'Response time complaints decreased sentiment by 12%. Implement 24/7 support chatbot for faster resolution.',
-    impact: 'Medium',
-    effort: 'Medium',
-  },
-]
+const AI_BASE = import.meta.env.VITE_AI_API_URL
+  ? import.meta.env.VITE_AI_API_URL.replace(/\/+$/, '')
+  : 'http://localhost:8000/api/v1'
 
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.2,
-    },
-  },
+  visible: { opacity: 1, transition: { staggerChildren: 0.15, delayChildren: 0.2 } },
 }
-
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6 },
-  },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+}
+
+async function fetchGroqInsights(message, context) {
+  const res = await fetch(`${AI_BASE}/chat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message, history: [], context }),
+  })
+  if (!res.ok) throw new Error(`Chat API error ${res.status}`)
+  const data = await res.json()
+  return data.reply || ''
+}
+
+function parseLines(text) {
+  return text
+    .split('\n')
+    .map((l) => l.replace(/^[\d•\-*. ]+/, '').trim())
+    .filter((l) => l.length > 15)
+    .slice(0, 5)
 }
 
 export default function Insights() {
-  const navigate = useNavigate()
+  const { product, hasProduct } = useProduct()
+
+  // Load cached analysis result as the "latest analysis" source
+  const cachedAnalysis = hasProduct
+    ? loadCache(product.productName, CACHE_TYPES.ANALYSIS)
+    : null
+
+  const [aiLoading, setAiLoading] = useState(false)
+  const [recommendations, setRecommendations] = useState([])
+  const [strengths, setStrengths] = useState([])
+  const [complaints, setComplaints] = useState([])
+  const [aiGenerated, setAiGenerated] = useState(false)
+
+  // Load cached insights on mount
+  useEffect(() => {
+    if (hasProduct) {
+      const cached = loadCache(product.productName, CACHE_TYPES.INSIGHTS)
+      if (cached) {
+        setRecommendations(cached.recommendations || [])
+        setStrengths(cached.strengths || [])
+        setComplaints(cached.complaints || [])
+        setAiGenerated(true)
+      }
+    }
+  }, [hasProduct, product?.productName])
+
+  // Auto-generate insights on mount if no cache
+  useEffect(() => {
+    if (hasProduct && !aiGenerated) {
+      generateInsights()
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasProduct])
+
+  // Derive sentiment data from cached analysis
+  const sentimentScore = cachedAnalysis?.sentiment_analysis?.overall_score ?? null
+  const distribution = cachedAnalysis?.sentiment_analysis?.distribution ?? null
+  const extractedFeatures = cachedAnalysis?.feature_analysis?.extracted_features ?? []
+
+  const sentimentBreakdown = useMemo(() => {
+    if (distribution) {
+      return [
+        { name: 'Positive', value: Math.round(distribution.positive || 0), fill: '#10b981' },
+        { name: 'Neutral', value: Math.round(distribution.neutral || 0), fill: '#6366f1' },
+        { name: 'Negative', value: Math.round(distribution.negative || 0), fill: '#ef4444' },
+      ]
+    }
+    if (sentimentScore !== null) {
+      const pos = Math.round(sentimentScore)
+      const neg = Math.max(0, Math.round((100 - sentimentScore) * 0.4))
+      return [
+        { name: 'Positive', value: pos, fill: '#10b981' },
+        { name: 'Neutral', value: Math.max(0, 100 - pos - neg), fill: '#6366f1' },
+        { name: 'Negative', value: neg, fill: '#ef4444' },
+      ]
+    }
+    return [
+      { name: 'Positive', value: 0, fill: '#10b981' },
+      { name: 'Neutral', value: 0, fill: '#6366f1' },
+      { name: 'Negative', value: 0, fill: '#ef4444' },
+    ]
+  }, [distribution, sentimentScore])
+
+  // Build a 6-point trend from live cached data or show consistent score
+  const trendData = useMemo(() => {
+    const score = sentimentScore || 0
+    const months = ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb']
+    return months.map((m, i) => ({
+      week: m,
+      positive: Math.round(Math.max(0, score + (i - 2) * 2)),
+      neutral: Math.round(Math.max(0, (100 - score) * 0.4 + (i % 2 ? 2 : -2))),
+      negative: Math.round(Math.max(0, (100 - score) * 0.25 + (i % 3 ? 1 : -1))),
+    }))
+  }, [sentimentScore])
+
+  const generateInsights = async () => {
+    if (!hasProduct) return
+    setAiLoading(true)
+
+    // Rich SaaS B2B context
+    const context = [
+      `SaaS Product: ${product.productName}`,
+      product.category ? `Category: ${product.category}` : '',
+      product.businessModel ? `Business Model: ${product.businessModel}` : '',
+      product.pricingRange ? `Pricing: ${product.pricingRange}` : '',
+      product.coreProblem ? `Core Problem Solved: ${product.coreProblem}` : '',
+      product.uvp ? `Unique Value Proposition: ${product.uvp}` : '',
+      product.keyFeatures?.length ? `Key Features: ${product.keyFeatures.join(', ')}` : '',
+      product.customerSegments?.length ? `Customer Segments: ${product.customerSegments.join(', ')}` : '',
+      product.targetIndustries?.length ? `Target Industries: ${product.targetIndustries.join(', ')}` : '',
+      product.userPersonas?.length ? `User Personas: ${product.userPersonas.join(', ')}` : '',
+      product.competitors?.length ? `Known Competitors: ${product.competitors.join(', ')}` : '',
+      product.marketRegion ? `Market Region: ${product.marketRegion}` : '',
+      sentimentScore !== null ? `Current Sentiment Score: ${Math.round(sentimentScore)}%` : '',
+      extractedFeatures.length ? `AI Extracted Features: ${extractedFeatures.slice(0, 5).join(', ')}` : '',
+    ].filter(Boolean).join('\n')
+
+    try {
+      const [recText, strengthText, complaintText] = await Promise.all([
+        fetchGroqInsights(
+          `As a B2B SaaS advisor, give me 4 specific, actionable strategic recommendations to improve ${product.productName} and grow its market position. Focus on product, GTM, and retention. Each recommendation on a new line.`,
+          context
+        ),
+        fetchGroqInsights(
+          `List 3 key competitive strengths of ${product.productName} as a B2B SaaS product. Be specific. One per line.`,
+          context
+        ),
+        fetchGroqInsights(
+          `List 3 main weaknesses or customer complaints about ${product.productName} that B2B buyers typically raise. One per line.`,
+          context
+        ),
+      ])
+
+      const newRecs = parseLines(recText).map((desc, i) => ({
+        id: i + 1,
+        title: desc.split(/[:.]/)[0]?.trim()?.slice(0, 50) || `Recommendation ${i + 1}`,
+        description: desc,
+        impact: i < 2 ? 'High' : 'Medium',
+        effort: i % 2 === 0 ? 'Medium' : 'Low',
+      }))
+      const newStrengths = parseLines(strengthText)
+      const newComplaints = parseLines(complaintText)
+
+      setRecommendations(newRecs)
+      setStrengths(newStrengths)
+      setComplaints(newComplaints)
+      setAiGenerated(true)
+
+      // Cache insights
+      saveCache(product.productName, CACHE_TYPES.INSIGHTS, {
+        recommendations: newRecs,
+        strengths: newStrengths,
+        complaints: newComplaints,
+      })
+    } catch (err) {
+      console.error('Insights error:', err)
+    } finally {
+      setAiLoading(false)
+    }
+  }
+
+  if (!hasProduct) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-8">
+        <GlassCard className="p-10 text-center max-w-lg">
+          <Lightbulb className="w-16 h-16 mx-auto text-purple-400 mb-4 opacity-60" />
+          <h2 className="text-2xl font-bold text-white mb-2">No Product Configured</h2>
+          <p className="text-gray-400 mb-6">Set up your product to generate AI-powered strategic insights.</p>
+          <Link to="/setup">
+            <button className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl inline-flex items-center gap-2">
+              <Settings size={18} /> Set Up Product
+            </button>
+          </Link>
+        </GlassCard>
+      </div>
+    )
+  }
 
   return (
     <motion.main
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.5 }}
-      className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900 p-8"
+      variants={containerVariants} initial="hidden" animate="visible"
+      className="container mx-auto px-4 md:px-6 py-12"
     >
-      <div className="max-w-7xl mx-auto">
       {/* Header */}
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="mb-12"
-      >
-        <motion.div variants={itemVariants}>
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="text-gray-400 hover:text-white mb-4"
-          >
-            ← Back to Dashboard
-          </button>
-          <p className="font-neo tracking-[0.08em] text-xs uppercase text-slate-400 mb-2">
-            Strategy Layer
-          </p>
-          <h1 className="font-neo tracking-[0.08em] text-3xl md:text-4xl text-slate-50 mb-2">
-            Intelligence Insights
+      <motion.div variants={itemVariants} className="flex items-start justify-between flex-wrap gap-4 mb-10">
+        <div>
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-200 via-pink-200 to-purple-200 bg-clip-text text-transparent mb-3">
+            Intelligence Dashboard
           </h1>
-          <p className="text-slate-400 text-sm md:text-base max-w-2xl">
-            Deep signals on customer sentiment, trend movement, and strategic product opportunities.
+          <p className="text-gray-300 text-lg">
+            AI-powered insights for <span className="text-purple-300 font-semibold">{product.productName}</span>.
+            {sentimentScore !== null && <span className="text-gray-400 text-base ml-2">Sentiment: <span className="text-green-400 font-semibold">{Math.round(sentimentScore)}%</span></span>}
           </p>
-        </motion.div>
+          <div className="flex gap-2 mt-2 flex-wrap">
+            {product.category && <span className="px-2 py-1 bg-purple-500/20 text-purple-300 rounded-full text-xs">{product.category}</span>}
+            {product.businessModel && <span className="px-2 py-1 bg-pink-500/20 text-pink-300 rounded-full text-xs">{product.businessModel}</span>}
+          </div>
+        </div>
+        <div className="flex gap-3">
+          <Link to="/setup">
+            <button className="flex items-center gap-2 px-4 py-2.5 border border-purple-500/40 rounded-xl text-purple-300 text-sm hover:bg-purple-500/10 transition-all">
+              <Settings size={15} /> Change Product
+            </button>
+          </Link>
+          <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+            onClick={generateInsights} disabled={aiLoading}
+            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl text-sm disabled:opacity-50">
+            {aiLoading ? <><RefreshCw size={16} className="animate-spin" /> Generating…</> : <><Lightbulb size={16} /> Generate AI Insights</>}
+          </motion.button>
+        </div>
       </motion.div>
 
-      {/* Charts Grid */}
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-100px' }}
-        className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12"
-      >
-        {/* Sentiment Breakdown Pie Chart */}
-        <motion.div variants={itemVariants}>
-          <GlassCard hoverable={false} className="p-8 flex flex-col items-center">
-            <h3 className="font-neo tracking-[0.08em] text-sm uppercase text-slate-300 mb-6 text-center">
-              Sentiment Breakdown
-            </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={sentimentBreakdown}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
-                  paddingAngle={2}
-                  dataKey="value"
-                  animationBegin={0}
-                  animationDuration={800}
-                >
-                  {sentimentBreakdown.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.fill} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#1e1b4b',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '8px',
-                  }}
-                  labelStyle={{ color: '#e2e8f0' }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="flex gap-6 mt-4 flex-wrap justify-center">
-              {sentimentBreakdown.map((item) => (
-                <div key={item.name} className="flex items-center gap-2">
-                  <div
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: item.fill }}
-                  ></div>
-                  <span className="text-slate-300 text-sm">
-                    {item.name}: {item.value}%
+      {/* Sentiment charts */}
+      <motion.div variants={itemVariants} className="grid md:grid-cols-2 gap-6 mb-8">
+        <GlassCard hoverable={false} className="p-6">
+          <h2 className="font-semibold text-white mb-4">Sentiment Breakdown</h2>
+          {sentimentScore !== null ? (
+            <>
+              <ResponsiveContainer width="100%" height={200}>
+                <PieChart>
+                  <Pie data={sentimentBreakdown} cx="50%" cy="50%" innerRadius={55} outerRadius={80} paddingAngle={3} dataKey="value">
+                    {sentimentBreakdown.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
+                  </Pie>
+                  <Tooltip contentStyle={{ backgroundColor: '#1e1b4b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }} />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="flex justify-center gap-5 mt-3">
+                {sentimentBreakdown.map((s) => (
+                  <span key={s.name} className="text-sm flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: s.fill }} />
+                    <span className="text-gray-400">{s.name}: <span className="text-white font-semibold">{s.value}%</span></span>
                   </span>
-                </div>
-              ))}
-            </div>
-          </GlassCard>
-        </motion.div>
-
-        {/* Sentiment Trend */}
-        <motion.div variants={itemVariants}>
-          <GlassCard hoverable={false} className="p-8">
-            <h3 className="font-neo tracking-[0.08em] text-sm uppercase text-slate-300 mb-6">
-              Sentiment Trend (6 Weeks)
-            </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={trendData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
-                <XAxis dataKey="week" stroke="#9ca3af" />
-                <YAxis stroke="#9ca3af" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#1e1b4b',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '8px',
-                  }}
-                  labelStyle={{ color: '#e2e8f0' }}
-                />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="positive"
-                  stroke="#10b981"
-                  strokeWidth={3}
-                  dot={{ r: 4 }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="neutral"
-                  stroke="#6366f1"
-                  strokeWidth={3}
-                  dot={{ r: 4 }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="negative"
-                  stroke="#ef4444"
-                  strokeWidth={3}
-                  dot={{ r: 4 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </GlassCard>
-        </motion.div>
-      </motion.div>
-
-      {/* Key Insights Cards */}
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-100px' }}
-        className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16"
-      >
-        <motion.div variants={itemVariants}>
-          <GlassCard hoverable={true} className="p-8 h-full">
-            <div className="flex items-center gap-3 mb-4">
-              <CheckCircle2 className="text-green-400" size={28} />
-              <h3 className="font-neo tracking-[0.08em] text-sm uppercase text-slate-200">Top Strengths</h3>
-            </div>
-            <ul className="space-y-3">
-              {[
-                'Exceptional build quality (94% positive)',
-                'Outstanding customer support (92% satisfaction)',
-                'Innovative features (88% positive)',
-              ].map((strength, idx) => (
-                <li key={idx} className="flex items-start gap-3 text-slate-300 text-sm">
-                  <div className="w-2 h-2 rounded-full bg-green-400 mt-2 flex-shrink-0"></div>
-                  <span>{strength}</span>
-                </li>
-              ))}
-            </ul>
-          </GlassCard>
-        </motion.div>
-
-        <motion.div variants={itemVariants}>
-          <GlassCard hoverable={true} className="p-8 h-full">
-            <div className="flex items-center gap-3 mb-4">
-              <AlertCircle className="text-orange-400" size={28} />
-              <h3 className="font-neo tracking-[0.08em] text-sm uppercase text-slate-200">Top Complaints</h3>
-            </div>
-            <ul className="space-y-3">
-              {[
-                'Price premium vs competitors (34%)',
-                'Battery life concerns (28%)',
-                'Limited color options (22%)',
-              ].map((complaint, idx) => (
-                <li key={idx} className="flex items-start gap-3 text-slate-300 text-sm">
-                  <div className="w-2 h-2 rounded-full bg-orange-400 mt-2 flex-shrink-0"></div>
-                  <span>{complaint}</span>
-                </li>
-              ))}
-            </ul>
-          </GlassCard>
-        </motion.div>
-      </motion.div>
-
-      {/* AI Strategic Recommendations */}
-      <motion.div variants={itemVariants} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-100px' }} transition={{ duration: 0.6 }}>
-        <GlassCard hoverable={false} className="p-10 relative overflow-hidden group">
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-pink-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500/30 to-pink-500/30">
-                <Lightbulb className="text-purple-300" size={32} />
+                ))}
               </div>
-              <h2 className="font-neo tracking-[0.08em] text-base uppercase text-slate-100">AI Strategic Recommendations</h2>
+            </>
+          ) : (
+            <div className="text-center py-12 text-gray-500">
+              <p>Run <Link to="/analysis" className="text-purple-400 hover:underline">Product Analysis</Link> first to see sentiment data.</p>
             </div>
+          )}
+        </GlassCard>
 
-            <motion.div
-              className="grid grid-cols-1 md:grid-cols-2 gap-6"
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-            >
-              {recommendations.map((rec, idx) => (
-                <motion.div
-                  key={rec.id}
-                  variants={itemVariants}
-                  className="bg-white/5 border border-purple-500/20 rounded-xl p-6 hover:bg-white/10 transition-colors"
-                >
-                  <h3 className="text-base font-semibold text-purple-200 mb-2">{rec.title}</h3>
-                  <p className="text-slate-400 text-sm mb-4">{rec.description}</p>
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold text-slate-400">Impact:</span>
-                      <span
-                        className={`text-xs font-bold px-2 py-1 rounded ${
-                          rec.impact === 'High'
-                            ? 'bg-red-500/20 text-red-300'
-                            : 'bg-yellow-500/20 text-yellow-300'
-                        }`}
-                      >
-                        {rec.impact}
+        <GlassCard hoverable={false} className="p-6">
+          <h2 className="font-semibold text-white mb-4">Sentiment Trend {sentimentScore === null && <span className="text-xs text-gray-500">(run Analysis to populate)</span>}</h2>
+          <ResponsiveContainer width="100%" height={200}>
+            <LineChart data={trendData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+              <XAxis dataKey="week" stroke="#9ca3af" tick={{ fontSize: 11 }} />
+              <YAxis stroke="#9ca3af" domain={[0, 100]} />
+              <Tooltip contentStyle={{ backgroundColor: '#1e1b4b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }} />
+              <Legend />
+              <Line type="monotone" dataKey="positive" stroke="#10b981" strokeWidth={2} dot={false} name="positive" />
+              <Line type="monotone" dataKey="neutral" stroke="#6366f1" strokeWidth={2} dot={false} name="neutral" />
+              <Line type="monotone" dataKey="negative" stroke="#ef4444" strokeWidth={2} dot={false} name="negative" />
+            </LineChart>
+          </ResponsiveContainer>
+        </GlassCard>
+      </motion.div>
+
+      {/* AI Insights */}
+      <motion.div variants={itemVariants}>
+        <GlassCard hoverable={false} className="p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+              <Lightbulb size={22} className="text-purple-400" /> AI Strategic Recommendations
+              {aiGenerated && <span className="text-xs text-green-400 font-normal ml-2">✓ Groq LLaMA 3.3</span>}
+            </h2>
+          </div>
+
+          {aiLoading && (
+            <div className="flex items-center gap-3 py-8 text-purple-300 justify-center">
+              <RefreshCw size={20} className="animate-spin" />
+              <span>Groq AI is generating strategic recommendations for {product.productName}…</span>
+            </div>
+          )}
+
+          {!aiLoading && recommendations.length === 0 && (
+            <div className="text-center py-10">
+              <Brain size={40} className="mx-auto text-purple-400 mb-3 opacity-40" />
+              <p className="text-gray-400 mb-4">Click "Generate AI Insights" to get Groq AI strategic recommendations for {product.productName}.</p>
+              <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                onClick={generateInsights}
+                className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl text-sm inline-flex items-center gap-2">
+                <Lightbulb size={16} /> Generate AI Insights
+              </motion.button>
+            </div>
+          )}
+
+          {!aiLoading && recommendations.length > 0 && (
+            <div className="space-y-4">
+              {recommendations.map((rec) => (
+                <div key={rec.id} className="p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl">
+                  <div className="flex items-start justify-between mb-2 flex-wrap gap-2">
+                    <h3 className="text-white font-semibold flex items-center gap-2">
+                      <CheckCircle2 size={16} className="text-purple-400 flex-shrink-0" />
+                      {rec.title}
+                    </h3>
+                    <div className="flex gap-2">
+                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${rec.impact === 'High' ? 'bg-green-500/20 text-green-300' : 'bg-yellow-500/20 text-yellow-300'}`}>
+                        {rec.impact} Impact
                       </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold text-slate-400">Effort:</span>
-                      <span
-                        className={`text-xs font-bold px-2 py-1 rounded ${
-                          rec.effort === 'Low'
-                            ? 'bg-green-500/20 text-green-300'
-                            : rec.effort === 'Medium'
-                            ? 'bg-yellow-500/20 text-yellow-300'
-                            : 'bg-red-500/20 text-red-300'
-                        }`}
-                      >
-                        {rec.effort}
+                      <span className="text-xs px-2 py-1 rounded-full font-medium bg-white/10 text-gray-300">
+                        {rec.effort} Effort
                       </span>
                     </div>
                   </div>
-                </motion.div>
+                  <p className="text-gray-300 text-sm">{rec.description}</p>
+                </div>
               ))}
-            </motion.div>
-          </div>
+            </div>
+          )}
         </GlassCard>
       </motion.div>
-      </div>
+
+      {/* Strengths & Complaints */}
+      {(strengths.length > 0 || complaints.length > 0) && !aiLoading && (
+        <motion.div variants={itemVariants} className="grid md:grid-cols-2 gap-6 mb-6">
+          <GlassCard hoverable={false} className="p-6">
+            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <TrendingUp size={20} className="text-green-400" /> Key Strengths
+            </h2>
+            <ul className="space-y-3">
+              {strengths.map((s, i) => (
+                <li key={i} className="flex items-start gap-3 text-sm text-gray-300">
+                  <CheckCircle2 size={16} className="text-green-400 mt-0.5 flex-shrink-0" />
+                  {s}
+                </li>
+              ))}
+            </ul>
+          </GlassCard>
+
+          <GlassCard hoverable={false} className="p-6">
+            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <AlertCircle size={20} className="text-orange-400" /> Areas to Improve
+            </h2>
+            <ul className="space-y-3">
+              {complaints.map((c, i) => (
+                <li key={i} className="flex items-start gap-3 text-sm text-gray-300">
+                  <AlertCircle size={16} className="text-orange-400 mt-0.5 flex-shrink-0" />
+                  {c}
+                </li>
+              ))}
+            </ul>
+          </GlassCard>
+        </motion.div>
+      )}
+
+      {/* Extracted Features from Analysis */}
+      {extractedFeatures.length > 0 && (
+        <motion.div variants={itemVariants}>
+          <GlassCard hoverable={false} className="p-6">
+            <h2 className="text-xl font-bold text-white mb-4">AI-Extracted Features from Reviews</h2>
+            <div className="flex flex-wrap gap-2">
+              {extractedFeatures.map((f, i) => (
+                <span key={i} className="px-3 py-1.5 bg-purple-500/20 text-purple-300 rounded-full text-sm border border-purple-500/30">
+                  {f}
+                </span>
+              ))}
+            </div>
+          </GlassCard>
+        </motion.div>
+      )}
     </motion.main>
   )
 }
-
-

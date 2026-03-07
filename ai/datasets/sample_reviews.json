@@ -1,0 +1,144 @@
+{
+  "products": [
+    {
+      "productId": "camlin-scissors-001",
+      "productName": "Camlin Scissors",
+      "category": "Office Supplies",
+      "reviews": [
+        {
+          "reviewId": "rev_001",
+          "rating": 5,
+          "text": "Excellent quality scissors! The blades are sharp and cut smoothly. Very durable and worth the price.",
+          "date": "2026-01-15",
+          "verified": true
+        },
+        {
+          "reviewId": "rev_002",
+          "rating": 4,
+          "text": "Good scissors for everyday use. The grip is comfortable and it feels sturdy. Minor issue with the hinge getting loose after 6 months.",
+          "date": "2026-01-20",
+          "verified": true
+        },
+        {
+          "reviewId": "rev_003",
+          "rating": 5,
+          "text": "Best scissors I've used! Sharp, precise cutting. The ergonomic design makes it easy to use for long periods.",
+          "date": "2026-02-01",
+          "verified": true
+        },
+        {
+          "reviewId": "rev_004",
+          "rating": 3,
+          "text": "Decent scissors but nothing exceptional. The price is reasonable but I expected better quality for a branded product.",
+          "date": "2026-02-10",
+          "verified": false
+        },
+        {
+          "reviewId": "rev_005",
+          "rating": 2,
+          "text": "Disappointed with the quality. The blades became dull after just a few weeks of use. Not worth the money.",
+          "date": "2026-02-15",
+          "verified": true
+        },
+        {
+          "reviewId": "rev_006",
+          "rating": 5,
+          "text": "Amazing product! Sharp, comfortable grip, and very reliable. My go-to scissors for all cutting tasks.",
+          "date": "2026-02-20",
+          "verified": true
+        },
+        {
+          "reviewId": "rev_007",
+          "rating": 4,
+          "text": "Great value for money. Works well for paper and light materials. The design is simple but effective.",
+          "date": "2026-02-25",
+          "verified": true
+        },
+        {
+          "reviewId": "rev_008",
+          "rating": 1,
+          "text": "Terrible quality. Broke within a week of purchase. Very poor construction and materials.",
+          "date": "2026-03-01",
+          "verified": true
+        },
+        {
+          "reviewId": "rev_009",
+          "rating": 5,
+          "text": "Perfect scissors! Sharp blades, comfortable to hold, and very durable. Highly recommended!",
+          "date": "2026-03-05",
+          "verified": true
+        },
+        {
+          "reviewId": "rev_010",
+          "rating": 4,
+          "text": "Good quality scissors. The cutting is smooth and precise. Only downside is the plastic handle feels a bit cheap.",
+          "date": "2026-03-06",
+          "verified": false
+        }
+      ]
+    },
+    {
+      "productId": "samsung-galaxy-m35",
+      "productName": "Samsung Galaxy M35",
+      "category": "Electronics",
+      "reviews": [
+        {
+          "reviewId": "rev_101",
+          "rating": 5,
+          "text": "Fantastic phone! The display is stunning, battery lasts all day, and the camera quality is impressive for the price.",
+          "date": "2026-02-10",
+          "verified": true
+        },
+        {
+          "reviewId": "rev_102",
+          "rating": 4,
+          "text": "Great value smartphone. Performance is smooth, 5G connectivity is fast. Only issue is it heats up during gaming.",
+          "date": "2026-02-15",
+          "verified": true
+        },
+        {
+          "reviewId": "rev_103",
+          "rating": 3,
+          "text": "Decent phone but has some lag issues with heavy apps. Camera is good in daylight but struggles in low light.",
+          "date": "2026-02-20",
+          "verified": false
+        },
+        {
+          "reviewId": "rev_104",
+          "rating": 5,
+          "text": "Excellent build quality and features! The 120Hz display is buttery smooth and the battery life is outstanding.",
+          "date": "2026-02-22",
+          "verified": true
+        },
+        {
+          "reviewId": "rev_105",
+          "rating": 2,
+          "text": "Not happy with this purchase. The software has bugs, camera quality is mediocre, and customer support is poor.",
+          "date": "2026-02-28",
+          "verified": true
+        },
+        {
+          "reviewId": "rev_106",
+          "rating": 4,
+          "text": "Solid mid-range phone. Good screen, decent camera, and reliable performance. Battery could be better.",
+          "date": "2026-03-01",
+          "verified": true
+        },
+        {
+          "reviewId": "rev_107",
+          "rating": 5,
+          "text": "Best phone in this price range! Fast processor, beautiful AMOLED display, and great camera system.",
+          "date": "2026-03-03",
+          "verified": true
+        },
+        {
+          "reviewId": "rev_108",
+          "rating": 1,
+          "text": "Very disappointed. Phone freezes frequently, battery drains fast, and build quality feels cheap.",
+          "date": "2026-03-05",
+          "verified": false
+        }
+      ]
+    }
+  ]
+}

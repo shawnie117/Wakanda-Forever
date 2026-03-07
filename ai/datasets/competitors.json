@@ -1,0 +1,70 @@
+{
+  "competitors": [
+    {
+      "category": "Office Supplies",
+      "products": [
+        {
+          "productName": "Camlin Scissors",
+          "price": 150,
+          "features": ["sharp blades", "ergonomic design", "durable", "comfortable grip", "precise cutting"],
+          "sentimentScore": 78,
+          "avgRating": 3.8
+        },
+        {
+          "productName": "Faber-Castell Scissors",
+          "price": 180,
+          "features": ["stainless steel blades", "premium quality", "soft grip handle", "rust resistant", "lifetime warranty"],
+          "sentimentScore": 85,
+          "avgRating": 4.5
+        },
+        {
+          "productName": "Classmate Scissors",
+          "price": 100,
+          "features": ["budget friendly", "basic design", "lightweight", "suitable for students"],
+          "sentimentScore": 65,
+          "avgRating": 3.2
+        },
+        {
+          "productName": "Maped Scissors",
+          "price": 200,
+          "features": ["professional grade", "titanium coating", "ambidextrous design", "soft touch grip", "precision cutting"],
+          "sentimentScore": 88,
+          "avgRating": 4.7
+        }
+      ]
+    },
+    {
+      "category": "Electronics",
+      "products": [
+        {
+          "productName": "Samsung Galaxy M35",
+          "price": 18999,
+          "features": ["5G connectivity", "AMOLED display", "120Hz refresh rate", "6000mAh battery", "50MP camera", "Android 14"],
+          "sentimentScore": 75,
+          "avgRating": 3.9
+        },
+        {
+          "productName": "Xiaomi Redmi Note 13 Pro",
+          "price": 17999,
+          "features": ["5G support", "AMOLED screen", "120Hz display", "5000mAh battery", "200MP camera", "MIUI 14", "fast charging 67W"],
+          "sentimentScore": 82,
+          "avgRating": 4.3
+        },
+        {
+          "productName": "Realme 12 Pro+",
+          "price": 19999,
+          "features": ["5G enabled", "curved AMOLED", "120Hz refresh", "5000mAh battery", "64MP periscope camera", "OIS support", "fast charging"],
+          "sentimentScore": 80,
+          "avgRating": 4.2
+        },
+        {
+          "productName": "Motorola Edge 40",
+          "price": 21999,
+          "features": ["5G connectivity", "pOLED display", "144Hz refresh rate", "4400mAh battery", "50MP camera", "stock Android", "wireless charging"],
+          "sentimentScore": 78,
+          "avgRating": 4.0
+        }
+      ]
+    }
+  ]
+}

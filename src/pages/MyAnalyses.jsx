@@ -15,6 +15,31 @@ export default function MyAnalyses() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
+  const getDisplayDate = (analysis) => {
+    const createdAt = analysis?.createdAt
+    if (createdAt?.toDate) {
+      return createdAt.toDate().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      })
+    }
+
+    const legacyDate = analysis?.created_at || analysis?.date || analysis?.createdOn
+    if (legacyDate) {
+      const parsed = new Date(legacyDate)
+      if (!Number.isNaN(parsed.getTime())) {
+        return parsed.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+        })
+      }
+    }
+
+    return 'Recent'
+  }
+
   useEffect(() => {
     if (!user) return
 
@@ -127,15 +152,11 @@ export default function MyAnalyses() {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <h3 className="text-xl font-bold text-white mb-1">
-                      {analysis.productName}
+                      {analysis.productName || analysis.product_name || 'Untitled Product'}
                     </h3>
                     <div className="flex items-center gap-2 text-sm text-slate-400">
                       <Calendar size={16} />
-                      {new Date(analysis.createdAt.toDate()).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                      })}
+                      {getDisplayDate(analysis)}
                     </div>
                   </div>
                 </div>
@@ -149,7 +170,7 @@ export default function MyAnalyses() {
                     <div>
                       <p className="text-xs text-slate-400">Sentiment Score</p>
                       <p className="text-lg font-bold text-purple-300">
-                        {analysis.sentimentScore}%
+                        {Number(analysis.sentimentScore ?? analysis.sentiment_score ?? 0)}%
                       </p>
                     </div>
                   </div>
@@ -161,7 +182,7 @@ export default function MyAnalyses() {
                     <div>
                       <p className="text-xs text-slate-400">Competitor Score</p>
                       <p className="text-lg font-bold text-pink-300">
-                        {analysis.competitorScore}%
+                        {Number(analysis.competitorScore ?? analysis.competitor_score ?? 0)}%
                       </p>
                     </div>
                   </div>

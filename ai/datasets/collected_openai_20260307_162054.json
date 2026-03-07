@@ -1,0 +1,40 @@
+{
+  "product": "OpenAI",
+  "records": [
+    {
+      "product": "OpenAI",
+      "source": "HackerNews",
+      "review": "OpenAI's board has fired Sam Altman",
+      "date": "2023-11-17T20:28:50Z",
+      "region": "Global"
+    },
+    {
+      "product": "OpenAI",
+      "source": "HackerNews",
+      "review": "Google “We have no moat, and neither does OpenAI”",
+      "date": "2023-05-04T10:19:13Z",
+      "region": "Global"
+    },
+    {
+      "product": "OpenAI",
+      "source": "HackerNews",
+      "review": "<a href=\"https:&#x2F;&#x2F;openai.com&#x2F;index&#x2F;introducing-gpt-oss&#x2F;\" rel=\"nofollow\">https:&#x2F;&#x2F;openai.com&#x2F;index&#x2F;introducing-gpt-oss&#x2F;</a>",
+      "date": "2025-08-05T17:02:02Z",
+      "region": "Global"
+    },
+    {
+      "product": "OpenAI",
+      "source": "HackerNews",
+      "review": "We have reached an agreement in principle for Sam to return to OpenAI as CEO",
+      "date": "2023-11-22T06:01:45Z",
+      "region": "Global"
+    },
+    {
+      "product": "OpenAI",
+      "source": "HackerNews",
+      "review": "OpenAI – How to delete your account",
+      "date": "2026-02-28T10:41:55Z",
+      "region": "Global"
+    }
+  ]
+}
