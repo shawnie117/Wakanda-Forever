@@ -18,6 +18,7 @@ import Insights from './pages/Insights'
 import AIAssistant from './pages/AIAssistant'
 import MyAnalyses from './pages/MyAnalyses'
 import SaaSProductSetup from './pages/SaaSProductSetup'
+import RegionalMarketMap from './pages/RegionalMarketMap'
 
 function App() {
   const [isLoading, setIsLoading] = useState(true)
@@ -115,6 +116,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <MyAnalyses />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/regional-market-map"
+                element={
+                  <ProtectedRoute>
+                    <RegionalMarketMap />
                   </ProtectedRoute>
                 }
               />

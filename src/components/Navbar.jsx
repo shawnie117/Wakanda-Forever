@@ -16,6 +16,7 @@ export default function Navbar() {
   const navLinks = [
     { name: 'Dashboard', path: '/dashboard' },
     { name: 'Market Intelligence', path: '/market-intelligence' },
+    { name: 'Regional Map', path: '/regional-market-map' },
     { name: 'Competitor Discovery', path: '/competitor-discovery' },
     { name: 'Product Health', path: '/product-health' },
     { name: 'Insights', path: '/insights' },
@@ -34,6 +35,9 @@ export default function Navbar() {
   const isActivePath = (path) => {
     if (path === '/market-intelligence') {
       return location.pathname.startsWith('/market-intelligence')
+    }
+    if (path === '/regional-market-map') {
+      return location.pathname === '/regional-market-map'
     }
     return location.pathname === path
   }
