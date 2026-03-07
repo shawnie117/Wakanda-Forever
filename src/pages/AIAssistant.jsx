@@ -23,7 +23,7 @@ export default function AIAssistant() {
     {
       id: 1,
       role: 'assistant',
-      text: "Hello! I'm VIBRANIUM AI — your product intelligence assistant. I'm powered by LLaMA 3.3 70B via Groq. Ask me anything about sentiment, competitor positioning, feature gaps, pricing strategy, or improvement opportunities!",
+      text: "Hello! I'm VIBRANIUM AI — your product intelligence assistant. Ask me anything about sentiment, competitor positioning, feature gaps, pricing strategy, or improvement opportunities!",
     },
   ])
   const [input, setInput] = useState('')
@@ -124,7 +124,7 @@ export default function AIAssistant() {
               <h1 className="font-neo tracking-[0.08em] text-2xl md:text-3xl text-slate-50">
                 AI Query Interface
               </h1>
-              <p className="text-slate-500 text-xs mt-1">Powered by LLaMA 3.3 70B · Groq</p>
+              <p className="text-slate-500 text-xs mt-1">Powered by Vibranium Intelligence Engine</p>
             </div>
           </div>
           <p className="text-slate-400 text-sm md:text-base">

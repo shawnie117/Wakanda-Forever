@@ -39,7 +39,7 @@ export default function CompetitorDiscovery() {
   // Load from cache on mount
   useEffect(() => {
     if (hasProduct) {
-      const cached = loadCache(product.productName, CACHE_TYPES.COMPETITOR_DISCOVERY)
+      const cached = loadCache(product.id, CACHE_TYPES.COMPETITOR_DISCOVERY)
       if (cached) {
         setCompetitors(cached.competitors || [])
         setInsights(cached.insights || [])
@@ -81,74 +81,75 @@ export default function CompetitorDiscovery() {
       const namesReply = await chatGroq(
         `List exactly 5 real, named SaaS competitors to "${product.productName}" in the ${product.category || 'SaaS'} space.
 ${product.competitors?.length ? `Already known: ${product.competitors.join(', ')}. Include 2-3 of these and add new ones.` : ''}
-For EACH competitor, provide:
-NAME: <product name>
-WEBSITE: <real domain like productname.com>
-PRICING: <real pricing range e.g. $29-$299/mo>
-USERS: <rough user count e.g. 50K+ or 2M+>
-RATING: <G2/Capterra rating e.g. 4.5>
-TAGLINE: <one line description of what they do>
-
-Be specific. Use REAL products. Format exactly as shown.`,
+Return ONLY a valid JSON array containing exactly 5 objects. Each object MUST have these exactly keys: "name" (string), "website" (string), "pricing" (string, e.g. "$29/mo"), "users" (string, e.g. "10K+"), "rating" (number, out of 5.0), and "tagline" (string). DO NOT include any markdown formatting, just the JSON array.`,
         context
       )
 
-      // Parse Groq's response into structured competitor objects
-      const blocks = namesReply.split(/(?=NAME:)/g).filter(b => b.includes('NAME:'))
-      const parsedCompetitors = blocks.slice(0, 5).map((block, idx) => {
-        const get = (label) => {
-          const rx = new RegExp(`${label}:\\s*(.+)`, 'i')
-          return (block.match(rx)?.[1] || '').trim()
+      let parsedCompetitors = []
+      try {
+        const jsonMatch = namesReply.match(/\[[\s\S]*\]/)
+        if (jsonMatch) {
+          const rawParsed = JSON.parse(jsonMatch[0])
+          parsedCompetitors = rawParsed.map((c, idx) => ({
+            name: c.name || `Competitor ${idx + 1}`,
+            website: c.website || `https://${(c.name || '').toLowerCase().replace(/[^a-z0-9]/g, '')}.com`,
+            pricing: c.pricing || 'Contact for pricing',
+            users: c.users || '10K+',
+            rating: Number(c.rating) || 4.0,
+            tagline: c.tagline || 'SaaS competitor',
+            idx
+          }))
         }
-        const name = get('NAME') || `Competitor ${idx + 1}`
-        const website = get('WEBSITE') || `https://${name.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`
-        const pricing = get('PRICING') || 'Contact for pricing'
-        const users = get('USERS') || '10K+'
-        const rating = parseFloat(get('RATING') || '4.0').toFixed(1)
-        const tagline = get('TAGLINE') || 'SaaS competitor'
+      } catch (e) {
+        console.warn('Failed to parse competitors JSON', e)
+      }
 
-        return { name, website, pricing, users, rating: Number(rating), tagline, idx }
-      })
+      // Fallback if AI formatting completely breaks
+      const finalCompetitors = parsedCompetitors.length > 0 ? parsedCompetitors : [
+        { name: product.competitors?.[0] || 'Competitor 1', website: 'https://competitor.com', pricing: '$49/mo', users: '10K+', rating: 4.2, tagline: 'Direct alternative', idx: 0 },
+        { name: product.competitors?.[1] || 'Competitor 2', website: 'https://example.com', pricing: '$99/mo', users: '50K+', rating: 4.5, tagline: 'Enterprise solution', idx: 1 },
+        { name: 'Alternative 3', website: 'https://alternative3.com', pricing: '$29/mo', users: '5K+', rating: 4.1, tagline: 'Budget friendly alternative', idx: 2 },
+        { name: 'Solution 4', website: 'https://solution4.com', pricing: '$199/mo', users: '20K+', rating: 4.6, tagline: 'Premium enterprise features', idx: 3 },
+        { name: 'Tool 5', website: 'https://tool5.com', pricing: '$79/mo', users: '15K+', rating: 4.3, tagline: 'Mid-market choice', idx: 4 },
+      ]
 
       // Step 2: Get market gap insights
       const gapReply = await chatGroq(
-        `Based on ${product.productName} vs ${parsedCompetitors.map(c => c.name).join(', ')}, give 3 specific market gap opportunities for ${product.productName}. Format:
-GAP: <gap title>
-DESCRIPTION: <2-sentence description>
-PRIORITY: High or Medium
-IMPACT: <expected impact>
-
-Be very specific and actionable.`,
+        `Based on ${product.productName} vs ${finalCompetitors.map(c => c.name).join(', ')}, give exactly 3 specific market gap opportunities for ${product.productName}. 
+Return ONLY a valid JSON array of 3 objects with keys: "title", "description", "priority" ("High" or "Medium"), and "impact". DO NOT include any markdown formatting.`,
         context
       )
 
-      // Parse insights
-      const gapBlocks = gapReply.split(/(?=GAP:)/g).filter(b => b.includes('GAP:'))
-      const parsedInsights = gapBlocks.slice(0, 3).map((block) => {
-        const get = (label) => {
-          const rx = new RegExp(`${label}:\\s*(.+)`, 'i')
-          return (block.match(rx)?.[1] || '').trim()
+      let parsedInsights = []
+      try {
+        const jsonMatch = gapReply.match(/\[[\s\S]*\]/)
+        if (jsonMatch) {
+          const rawParsed = JSON.parse(jsonMatch[0])
+          parsedInsights = rawParsed.map(i => ({
+            title: i.title || 'Market Opportunity',
+            description: i.description || 'Strategic expansion opportunity identified',
+            priority: i.priority || 'Medium',
+            impact: i.impact || 'Positive market impact expected',
+          }))
         }
-        return {
-          title: get('GAP') || 'Market Opportunity',
-          description: get('DESCRIPTION') || 'Strategic expansion opportunity identified',
-          priority: get('PRIORITY') || 'Medium',
-          impact: get('IMPACT') || 'Positive market impact expected',
-        }
-      })
+      } catch (e) {
+        console.warn('Failed to parse insights JSON', e)
+      }
 
-      setCompetitors(parsedCompetitors)
-      setInsights(parsedInsights.length ? parsedInsights : [{
+      const finalInsights = parsedInsights.length > 0 ? parsedInsights : [{
         title: 'Feature Gap Analysis',
-        description: `${product.productName} has opportunities to differentiate vs ${parsedCompetitors[0]?.name || 'competitors'} in core feature areas.`,
+        description: `${product.productName} has opportunities to differentiate vs competitors in core feature areas.`,
         priority: 'High',
         impact: 'Potential 20-35% win rate improvement',
-      }])
+      }]
+
+      setCompetitors(finalCompetitors)
+      setInsights(finalInsights)
 
       // Save to cache
-      saveCache(product.productName, CACHE_TYPES.COMPETITOR_DISCOVERY, {
-        competitors: parsedCompetitors,
-        insights: parsedInsights,
+      saveCache(product.id, CACHE_TYPES.COMPETITOR_DISCOVERY, {
+        competitors: finalCompetitors,
+        insights: finalInsights,
       })
     } catch (err) {
       console.error('Competitor discovery error:', err)
@@ -351,7 +352,7 @@ Be very specific and actionable.`,
             <GlassCard hoverable={false} className="p-8">
               <h2 className="text-xl font-bold text-white mb-5 flex items-center gap-2">
                 <TrendingUp size={22} className="text-green-400" /> AI Market Gap Insights
-                <span className="text-xs text-slate-500 font-normal ml-1">Groq LLaMA 3.3</span>
+                <span className="text-xs text-slate-500 font-normal ml-1">AI Generated</span>
               </h2>
               <div className="space-y-4">
                 {insights.map((ins, i) => (

@@ -89,51 +89,70 @@ const defaultProduct = {
   },
 }
 
+const defaultProductState = {
+  activeId: 'default',
+  products: [{ id: 'default', ...defaultProduct }],
+}
+
 export function ProductProvider({ children }) {
   const { user } = useAuth()
-  const [product, setProductState] = useState(() => {
+  const [store, setStore] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
-      if (saved) return { ...defaultProduct, ...JSON.parse(saved) }
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        // Migration from old single-product structure
+        if (!parsed.products) {
+          return { activeId: 'default', products: [{ id: 'default', ...defaultProduct, ...parsed }] }
+        }
+        return parsed
+      }
     } catch (_) {}
-    return defaultProduct
+    return defaultProductState
   })
+  
   const [isLoadingFromFirestore, setIsLoadingFromFirestore] = useState(false)
-  const [lastSyncedProduct, setLastSyncedProduct] = useState(null)
+  const [lastSyncedStore, setLastSyncedStore] = useState(null)
+
+  // Computed active product
+  const product = store.products.find(p => p.id === store.activeId) || defaultProduct
 
   // Load user's product data from Firestore when user logs in
   useEffect(() => {
     if (!user?.uid) {
-      // User logged out - clear product data
-      setProductState(defaultProduct)
+      setStore(defaultProductState)
       try { localStorage.removeItem(STORAGE_KEY) } catch (_) {}
-      setLastSyncedProduct(null)
+      setLastSyncedStore(null)
       return
     }
 
-    // Load from Firestore
     async function loadUserProduct() {
       setIsLoadingFromFirestore(true)
       try {
         const firestoreData = await getUserProductContext(user.uid)
         
         if (firestoreData) {
-          const mergedData = { ...defaultProduct, ...firestoreData }
-          setProductState(mergedData)
-          setLastSyncedProduct(mergedData)
-          try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedData))
-          } catch (_) {}
+          let mergedStore = firestoreData
+          // Migration from old single-product structure
+          if (!firestoreData.products) {
+            mergedStore = { activeId: 'default', products: [{ id: 'default', ...defaultProduct, ...firestoreData }] }
+          }
+          setStore(mergedStore)
+          setLastSyncedStore(mergedStore)
+          try { localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedStore)) } catch (_) {}
         } else {
           // No Firestore data, check localStorage
           try {
             const localData = localStorage.getItem(STORAGE_KEY)
             if (localData) {
               const parsed = JSON.parse(localData)
-              setProductState({ ...defaultProduct, ...parsed })
-              // Save to Firestore to sync
-              await saveUserProductContext(user.uid, parsed)
-              setLastSyncedProduct(parsed)
+              let mergedStore = parsed
+              if (!parsed.products) {
+                mergedStore = { activeId: 'default', products: [{ id: 'default', ...defaultProduct, ...parsed }] }
+              }
+              setStore(mergedStore)
+              await saveUserProductContext(user.uid, mergedStore)
+              setLastSyncedStore(mergedStore)
             }
           } catch (_) {}
         }
@@ -147,44 +166,65 @@ export function ProductProvider({ children }) {
     loadUserProduct()
   }, [user?.uid])
 
-  // Auto-save to Firestore when product changes (with debouncing)
+  // Auto-save to Firestore when store changes (with debouncing)
   useEffect(() => {
     if (!user?.uid || isLoadingFromFirestore) return
     
-    // Don't save if product hasn't actually changed
-    if (JSON.stringify(product) === JSON.stringify(lastSyncedProduct)) return
+    if (JSON.stringify(store) === JSON.stringify(lastSyncedStore)) return
 
     const timeoutId = setTimeout(async () => {
       try {
-        await saveUserProductContext(user.uid, product)
-        setLastSyncedProduct(product)
+        await saveUserProductContext(user.uid, store)
+        setLastSyncedStore(store)
       } catch (error) {
-        console.error('Error auto-saving product to Firestore:', error)
+        console.error('Error auto-saving store to Firestore:', error)
       }
-    }, 1000) // Debounce for 1 second
+    }, 1000)
 
     return () => clearTimeout(timeoutId)
-  }, [product, user?.uid, isLoadingFromFirestore, lastSyncedProduct])
+  }, [store, user?.uid, isLoadingFromFirestore, lastSyncedStore])
 
   const setProduct = (updates) => {
-    setProductState((prev) => {
-      const next = { ...prev, ...updates }
+    setStore((prev) => {
+      const updatedProducts = prev.products.map(p => 
+        p.id === prev.activeId ? { ...p, ...updates } : p
+      )
+      const next = { ...prev, products: updatedProducts }
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)) } catch (_) {}
+      return next
+    })
+  }
+
+  const switchProduct = (id) => {
+    setStore(prev => {
+      const next = { ...prev, activeId: id }
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)) } catch (_) {}
+      return next
+    })
+  }
+
+  const addNewProduct = () => {
+    const newId = `prod_${Date.now()}`
+    setStore(prev => {
+      const next = { 
+        activeId: newId, 
+        products: [...prev.products, { id: newId, ...defaultProduct }] 
+      }
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)) } catch (_) {}
       return next
     })
   }
 
   const clearProduct = async () => {
-    setProductState(defaultProduct)
+    setStore(defaultProductState)
     try { localStorage.removeItem(STORAGE_KEY) } catch (_) {}
     
-    // Also clear from Firestore
     if (user?.uid) {
       try {
-        await saveUserProductContext(user.uid, defaultProduct)
-        setLastSyncedProduct(defaultProduct)
+        await saveUserProductContext(user.uid, defaultProductState)
+        setLastSyncedStore(defaultProductState)
       } catch (error) {
-        console.error('Error clearing product from Firestore:', error)
+        console.error('Error clearing store from Firestore:', error)
       }
     }
   }
@@ -194,9 +234,12 @@ export function ProductProvider({ children }) {
   return (
     <ProductContext.Provider 
       value={{ 
+        store,
         product, 
         setProduct, 
         clearProduct, 
+        switchProduct,
+        addNewProduct,
         hasProduct,
         isLoadingFromFirestore 
       }}

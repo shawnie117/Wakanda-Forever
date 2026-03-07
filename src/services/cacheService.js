@@ -8,23 +8,23 @@
 const PREFIX = 'vibranium_cache_'
 const VERSION = 'v2'
 
-function key(productName, type) {
-  const safe = String(productName || 'unknown').toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 40)
+function key(productId, type) {
+  const safe = String(productId || 'unknown').replace(/[^a-zA-Z0-9_-]/g, '')
   return `${PREFIX}${VERSION}_${safe}_${type}`
 }
 
-export function saveCache(productName, type, data) {
+export function saveCache(productId, type, data) {
   try {
     const payload = JSON.stringify({ data, ts: Date.now() })
-    localStorage.setItem(key(productName, type), payload)
+    localStorage.setItem(key(productId, type), payload)
   } catch (e) {
     console.warn('Cache save failed:', e)
   }
 }
 
-export function loadCache(productName, type, maxAgeMs = 24 * 60 * 60 * 1000) {
+export function loadCache(productId, type, maxAgeMs = 24 * 60 * 60 * 1000) {
   try {
-    const raw = localStorage.getItem(key(productName, type))
+    const raw = localStorage.getItem(key(productId, type))
     if (!raw) return null
     const { data, ts } = JSON.parse(raw)
     if (Date.now() - ts > maxAgeMs) return null // expired
@@ -34,15 +34,15 @@ export function loadCache(productName, type, maxAgeMs = 24 * 60 * 60 * 1000) {
   }
 }
 
-export function clearCache(productName, type) {
+export function clearCache(productId, type) {
   try {
-    localStorage.removeItem(key(productName, type))
+    localStorage.removeItem(key(productId, type))
   } catch {}
 }
 
-export function clearAllCache(productName) {
+export function clearAllCache(productId) {
   try {
-    const prefix = key(productName, '')
+    const prefix = key(productId, '')
     Object.keys(localStorage)
       .filter((k) => k.startsWith(prefix.slice(0, -1)))
       .forEach((k) => localStorage.removeItem(k))

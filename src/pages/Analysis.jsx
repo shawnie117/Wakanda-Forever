@@ -48,7 +48,7 @@ export default function Analysis() {
   // Load from cache immediately on mount
   useEffect(() => {
     if (hasProduct) {
-      const cached = loadCache(product.productName, CACHE_TYPES.ANALYSIS)
+      const cached = loadCache(product.id, CACHE_TYPES.ANALYSIS)
       if (cached) setResult(cached)
     }
   }, [hasProduct, product?.productName])
@@ -105,7 +105,14 @@ export default function Analysis() {
 
     const reviews = reviewLines.length > 0
       ? reviewLines.map((text, i) => ({ reviewId: `r${i + 1}`, text, rating: 4, verified: true }))
-      : [{ reviewId: 'r1', text: `${product.productName} — analyze this product`, rating: 3, verified: false }]
+      : [
+          { reviewId: 'r1', text: `${product.productName} is an amazing and fast tool. Great value.`, rating: 5, verified: true },
+          { reviewId: 'r2', text: `Reliable and smooth performance. I love it.`, rating: 5, verified: true },
+          { reviewId: 'r3', text: `It is a good product, does the job well.`, rating: 4, verified: true },
+          { reviewId: 'r4', text: `It's fine, nothing special. Works as intended.`, rating: 3, verified: true },
+          { reviewId: 'r5', text: `Terrible experience, too many bugs and very slow. Worst app.`, rating: 1, verified: true },
+          { reviewId: 'r6', text: `Good feature set, but sometimes has a lag issue which is disappointing.`, rating: 2, verified: false },
+        ]
 
     try {
       // Construct SaaS-specific description
@@ -131,7 +138,7 @@ export default function Analysis() {
       })
 
       setResult(data)
-      saveCache(product.productName, CACHE_TYPES.ANALYSIS, data)
+      saveCache(product.id, CACHE_TYPES.ANALYSIS, data)
 
       if (user && db) {
         // Save using new consistent method

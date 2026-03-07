@@ -46,7 +46,7 @@ export default function Comparison() {
   // Load from cache on mount
   useEffect(() => {
     if (hasProduct) {
-      const cached = loadCache(product.productName, CACHE_TYPES.COMPARISON)
+      const cached = loadCache(product.id, CACHE_TYPES.COMPARISON)
       if (cached) setComparisonData(cached)
     }
   }, [hasProduct, product?.productName])
@@ -79,7 +79,7 @@ export default function Comparison() {
         competitorNames: allCompetitors.slice(0, 3),
       })
       setComparisonData(result)
-      saveCache(product.productName, CACHE_TYPES.COMPARISON, result)
+      saveCache(product.id, CACHE_TYPES.COMPARISON, result)
     } catch (err) {
       console.error('Comparison error:', err)
       setError(err.message || 'Comparison failed. Ensure AI backend is running.')
@@ -335,8 +335,7 @@ export default function Comparison() {
             <motion.div variants={itemVariants} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
               <GlassCard hoverable={false} className="p-8 bg-gradient-to-br from-purple-500/10 to-pink-500/10">
                 <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-                  <TrendingUp size={20} className="text-green-400" /> AI Strategic Recommendations
-                  <span className="text-xs text-slate-500 font-normal ml-2">via Groq LLaMA</span>
+                  <Lightbulb className="text-purple-400" size={24} /> AI Strategic Advice
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {strategies.map((s, i) => (

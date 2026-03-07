@@ -37,7 +37,7 @@ export default function MarketIntelligence() {
   // Load from cache on mount
   useEffect(() => {
     if (hasProduct) {
-      const cached = loadCache(product.productName, CACHE_TYPES.MARKET_INTELLIGENCE)
+      const cached = loadCache(product.id, CACHE_TYPES.MARKET_INTELLIGENCE)
       if (cached) setResults(cached)
     }
   }, [hasProduct, product?.productName])
@@ -180,7 +180,7 @@ THREATS:
         totalProducts: comparison?.overall_position?.total_products,
       }
       setResults(finalResults)
-      saveCache(product.productName, CACHE_TYPES.MARKET_INTELLIGENCE, finalResults)
+      saveCache(product.id, CACHE_TYPES.MARKET_INTELLIGENCE, finalResults)
     } catch (err) {
       console.error('MarketIntelligence error:', err)
       setError('Analysis failed. Make sure the AI backend is running.')
@@ -380,7 +380,7 @@ THREATS:
           {results.aiInsights && (
             <GlassCard hoverable={false} className="p-8">
               <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <Brain className="text-purple-400" size={22} /> AI Insights <span className="text-xs text-slate-500 font-normal ml-1">Groq LLaMA 3.3</span>
+                <Brain className="text-purple-400" size={22} /> AI Insights <span className="text-xs text-slate-500 font-normal ml-1">Generated Real-time</span>
               </h2>
               <p className="text-gray-300 leading-relaxed whitespace-pre-line">{results.aiInsights}</p>
             </GlassCard>

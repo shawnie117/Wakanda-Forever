@@ -30,6 +30,8 @@ class DataCollectors:
         self.reddit_client_secret = os.getenv("REDDIT_CLIENT_SECRET", "").strip()
         self.reddit_user_agent = os.getenv("REDDIT_USER_AGENT", "vibranium-ai-collector/1.0").strip()
         self.producthunt_token = os.getenv("PRODUCTHUNT_ACCESS_TOKEN", "").strip()
+        self.producthunt_client_id = os.getenv("PRODUCTHUNT_CLIENT_ID", "").strip()
+        self.producthunt_client_secret = os.getenv("PRODUCTHUNT_CLIENT_SECRET", "").strip()
 
         ai_root = Path(__file__).resolve().parents[1]
         self.datasets_dir = ai_root / "datasets"
@@ -141,8 +143,27 @@ class DataCollectors:
         """
         Collect launch descriptions from Product Hunt GraphQL.
         """
-        if not self.producthunt_token:
-            logger.info("Product Hunt token missing; skipping Product Hunt collector")
+        token = self.producthunt_token
+        
+        # If no direct token, try to get one using client credentials
+        if not token and self.producthunt_client_id and self.producthunt_client_secret:
+            try:
+                with httpx.Client(timeout=10.0) as client:
+                    token_res = client.post(
+                        "https://api.producthunt.com/v2/oauth/token",
+                        json={
+                            "client_id": self.producthunt_client_id,
+                            "client_secret": self.producthunt_client_secret,
+                            "grant_type": "client_credentials"
+                        }
+                    )
+                    token_res.raise_for_status()
+                    token = token_res.json().get("access_token")
+            except Exception as e:
+                logger.warning("Failed to get Product Hunt token: %s", str(e))
+
+        if not token:
+            logger.info("Product Hunt token/credentials missing; skipping collector")
             return []
 
         query = """
@@ -158,7 +179,7 @@ class DataCollectors:
         }
         """
         headers = {
-            "Authorization": f"Bearer {self.producthunt_token}",
+            "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
         }
         body = {"query": query, "variables": {"query": product_name, "first": max_items}}

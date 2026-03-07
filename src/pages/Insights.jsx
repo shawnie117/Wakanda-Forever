@@ -50,7 +50,7 @@ export default function Insights() {
 
   // Load cached analysis result as the "latest analysis" source
   const cachedAnalysis = hasProduct
-    ? loadCache(product.productName, CACHE_TYPES.ANALYSIS)
+    ? loadCache(product.id, CACHE_TYPES.ANALYSIS)
     : null
 
   const [aiLoading, setAiLoading] = useState(false)
@@ -62,7 +62,7 @@ export default function Insights() {
   // Load cached insights on mount
   useEffect(() => {
     if (hasProduct) {
-      const cached = loadCache(product.productName, CACHE_TYPES.INSIGHTS)
+      const cached = loadCache(product.id, CACHE_TYPES.INSIGHTS)
       if (cached) {
         setRecommendations(cached.recommendations || [])
         setStrengths(cached.strengths || [])
@@ -175,7 +175,7 @@ export default function Insights() {
       setAiGenerated(true)
 
       // Cache insights
-      saveCache(product.productName, CACHE_TYPES.INSIGHTS, {
+      saveCache(product.id, CACHE_TYPES.INSIGHTS, {
         recommendations: newRecs,
         strengths: newStrengths,
         complaints: newComplaints,
@@ -312,7 +312,7 @@ export default function Insights() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-white flex items-center gap-2">
               <Lightbulb size={22} className="text-purple-400" /> AI Strategic Recommendations
-              {aiGenerated && <span className="text-xs text-green-400 font-normal ml-2">✓ Groq LLaMA 3.3</span>}
+              {aiGenerated && <span className="text-xs text-green-400 font-normal ml-2">✓ AI Generated</span>}
             </h2>
           </div>
 

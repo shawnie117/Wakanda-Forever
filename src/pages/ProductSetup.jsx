@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -418,6 +418,10 @@ export default function ProductSetup() {
   const [step, setStep] = useState(1)
   const [localData, setLocalData] = useState({ ...product })
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    setLocalData({ ...product })
+  }, [product.id]) // Sync when active product changes
 
   const onChange = (key, val) => {
     setLocalData((prev) => ({ ...prev, [key]: val }))

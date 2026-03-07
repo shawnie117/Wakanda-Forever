@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useProduct } from '../context/ProductContext'
 import { loadCache, CACHE_TYPES } from '../services/cacheService'
@@ -31,15 +31,16 @@ function getDisplayName(user) {
 
 export default function Dashboard() {
   const { user } = useAuth()
-  const { product, hasProduct } = useProduct()
+  const { store, product, hasProduct, switchProduct, addNewProduct } = useProduct()
+  const navigate = useNavigate()
 
   // Derive live stats from localStorage cache (no Firestore)
   const stats = useMemo(() => {
     if (!hasProduct) return { totalAnalyses: 0, avgSentiment: 0, avgCompetitor: 0, topFeatures: [], competitors: [] }
 
-    const analysis = loadCache(product.productName, CACHE_TYPES.ANALYSIS)
-    const comparison = loadCache(product.productName, CACHE_TYPES.COMPARISON)
-    const mi = loadCache(product.productName, CACHE_TYPES.MARKET_INTELLIGENCE)
+    const analysis = loadCache(product.id, CACHE_TYPES.ANALYSIS)
+    const comparison = loadCache(product.id, CACHE_TYPES.COMPARISON)
+    const mi = loadCache(product.id, CACHE_TYPES.MARKET_INTELLIGENCE)
 
     const sentimentScore =
       analysis?.sentiment_analysis?.overall_score ??
@@ -57,8 +58,8 @@ export default function Dashboard() {
       analysis ? 1 : 0,
       comparison ? 1 : 0,
       mi ? 1 : 0,
-      loadCache(product.productName, CACHE_TYPES.INSIGHTS) ? 1 : 0,
-      loadCache(product.productName, CACHE_TYPES.COMPETITOR_DISCOVERY) ? 1 : 0,
+      loadCache(product.id, CACHE_TYPES.INSIGHTS) ? 1 : 0,
+      loadCache(product.id, CACHE_TYPES.COMPETITOR_DISCOVERY) ? 1 : 0,
     ].reduce((a, b) => a + b, 0)
 
     return {
@@ -71,10 +72,10 @@ export default function Dashboard() {
   }, [hasProduct, product])
 
   const features = [
-    { icon: Zap, title: 'Product Analysis', description: 'Analyze customer sentiment with live Groq AI', path: '/analysis', color: 'text-purple-300' },
+    { icon: Zap, title: 'Product Analysis', description: 'Analyze customer sentiment with live AI', path: '/analysis', color: 'text-purple-300' },
     { icon: BarChart3, title: 'Competitor Comparison', description: 'Compare against competitors with live AI', path: '/comparison', color: 'text-blue-300' },
-    { icon: TrendingUp, title: 'Strategic Insights', description: 'AI recommendations from Groq LLaMA 3.3', path: '/insights', color: 'text-pink-300' },
-    { icon: Brain, title: 'AI Assistant', description: 'Chat with LLaMA 3.3 70B about your product', path: '/assistant', color: 'text-green-300' },
+    { icon: TrendingUp, title: 'Strategic Insights', description: 'AI recommendations for your product', path: '/insights', color: 'text-pink-300' },
+    { icon: Brain, title: 'AI Assistant', description: 'Chat with AI about your product', path: '/assistant', color: 'text-green-300' },
     { icon: Globe, title: 'Regional Map', description: 'Geographic market opportunity analysis', path: '/regional-map', color: 'text-cyan-300' },
     { icon: Search, title: 'Competitor Discovery', description: 'Discover real SaaS competitors with AI', path: '/competitor-discovery', color: 'text-orange-300' },
   ]
@@ -118,14 +119,31 @@ export default function Dashboard() {
       {/* Product pill */}
       {hasProduct && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-8 flex items-center gap-3 flex-wrap">
-          <span className="px-4 py-2 bg-purple-500/20 border border-purple-500/30 rounded-full text-purple-200 text-sm font-medium flex items-center gap-2">
-            <Target size={14} /> {product.productName}
-            {product.category && <span className="text-purple-400 text-xs">· {product.category}</span>}
-          </span>
+          <div className="flex items-center bg-purple-500/20 border border-purple-500/30 rounded-full px-4 py-1">
+            <Target size={14} className="text-purple-300 mr-2" />
+            <select
+              value={store.activeId}
+              onChange={(e) => switchProduct(e.target.value)}
+              className="bg-transparent text-purple-200 text-sm font-medium outline-none cursor-pointer appearance-none pr-4"
+              title="Switch Product"
+            >
+              {store.products.filter(p => p.productName).map(p => (
+                <option key={p.id} value={p.id} className="bg-slate-800 text-white">
+                  {p.productName}
+                </option>
+              ))}
+            </select>
+          </div>
           {product.businessModel && (
             <span className="px-3 py-1.5 bg-pink-500/15 border border-pink-500/25 rounded-full text-pink-300 text-xs">{product.businessModel}</span>
           )}
-          <Link to="/setup" className="text-xs text-slate-500 hover:text-purple-400 transition-colors">Change →</Link>
+          <Link to="/setup" className="text-xs text-slate-400 hover:text-purple-400 transition-colors">Edit Setup</Link>
+          <button
+            onClick={() => { addNewProduct(); navigate('/setup'); }}
+            className="text-xs text-slate-400 hover:text-green-400 transition-colors border-l border-slate-700 pl-3"
+          >
+            + Add New Product
+          </button>
         </motion.div>
       )}
 
@@ -143,7 +161,7 @@ export default function Dashboard() {
           <AnalyticsCard
             title="Sentiment Score"
             value={stats.avgSentiment > 0 ? `${stats.avgSentiment}%` : '—'}
-            subtitle={stats.avgSentiment > 0 ? 'Live from Groq AI analysis' : 'Run Analysis page to generate'}
+            subtitle={stats.avgSentiment > 0 ? 'Live from AI analysis' : 'Run Analysis page to generate'}
             Icon={TrendingUp}
           />
         </motion.div>
