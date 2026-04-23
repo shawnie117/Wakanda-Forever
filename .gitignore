@@ -37,6 +37,7 @@ dist-ssr
 # Markdown docs
 *.md
 **/*.md
+!/README.md
 
 # Python cache/artifacts
 __pycache__/
